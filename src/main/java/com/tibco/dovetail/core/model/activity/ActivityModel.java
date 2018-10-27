@@ -1,0 +1,57 @@
+package com.tibco.dovetail.core.model.activity;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tibco.dovetail.core.model.common.SimpleAttribute;
+import com.tibco.dovetail.core.runtime.flow.ActivityRegistry;
+
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class ActivityModel {
+    private String ref;
+    private Map<String, SimpleAttribute> inputs = new HashMap<String, SimpleAttribute>();
+    private Map<String, SimpleAttribute> outputs = new HashMap<String, SimpleAttribute>();
+
+    public String getRef() {
+        return ref;
+    }
+
+    public void setRef(String ref) {
+        this.ref = ref;
+    }
+    
+    public SimpleAttribute getInputs(String name) {
+        return inputs.get(name);
+    }
+
+    public void setInputs(List<SimpleAttribute> inputs) {
+        inputs.forEach(in -> this.inputs.put(in.getName(), in));
+    }
+
+    public SimpleAttribute getOutputs(String name) {
+        return outputs.get(name);
+    }
+
+    public void setOutputs(List<SimpleAttribute> outputs) {
+        outputs.forEach(out -> this.outputs.put(out.getName(), out));
+    }
+
+
+    public static ActivityModel loadModel(ObjectMapper mapper, String ref) throws Exception{
+    		String[] path = ref.split("/");
+        String clazz = "smartcontract.activity." + path[path.length-1] + "." + path[path.length-1];
+        InputStream isJson = Class.forName(clazz).getResourceAsStream("activity.json");
+        if (isJson == null)
+            throw new FileNotFoundException("activity.json file is not found for " + ref);
+
+        ActivityModel model = mapper.readValue(isJson, ActivityModel.class);
+        ActivityRegistry.registerActivity(ref, clazz);
+        isJson.close();
+        return model;
+    }
+}
