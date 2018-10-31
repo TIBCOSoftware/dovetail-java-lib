@@ -16,7 +16,7 @@ public class DovetailEngine {
     	 // triggers
 	    TriggerConfig[] triggerConfigs = app.getTriggers();
 	    if(triggerConfigs == null || triggerConfigs.length == 0)
-	    		throw new RuntimeException("There is trigger defined in the application");
+	    		throw new RuntimeException("There is no trigger defined in the application");
 	    
 	    if(triggerConfigs.length >1)
 				throw new RuntimeException("Each application can have only one type of trigger");

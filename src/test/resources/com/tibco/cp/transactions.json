@@ -15,7 +15,7 @@
          "id": "Logger",
          "name": "Logger",
          "activity": {
-          "ref": "github.com/TIBCOSoftware/honeycomb/flogo-contrib/extension/activity/logger",
+          "ref": "github.com/TIBCOSoftware/dovetail/flogo-contrib/extension/activity/logger",
           "input": {
            "logLevel": "INFO"
           },
@@ -35,7 +35,7 @@
          "id": "LedgerOperation",
          "name": "LedgerOperation",
          "activity": {
-          "ref": "github.com/TIBCOSoftware/honeycomb/flogo-contrib/extension/activity/ledger",
+          "ref": "github.com/TIBCOSoftware/dovetail/flogo-contrib/extension/activity/ledger",
           "input": {
            "model": "IOUDemo",
            "assetName": "com.tibco.cp.IOU",
@@ -97,7 +97,7 @@
          "id": "TransactionResponse",
          "name": "TransactionResponse",
          "activity": {
-          "ref": "github.com/TIBCOSoftware/honeycomb/flogo-contrib/extension/activity/txnreply",
+          "ref": "github.com/TIBCOSoftware/dovetail/flogo-contrib/extension/activity/txnreply",
           "input": {
            "status": "Success"
           },
@@ -108,7 +108,7 @@
          "id": "amtErr",
          "name": "amtErr",
          "activity": {
-          "ref": "github.com/TIBCOSoftware/honeycomb/flogo-contrib/extension/activity/txnreply",
+          "ref": "github.com/TIBCOSoftware/dovetail/flogo-contrib/extension/activity/txnreply",
           "input": {
            "status": "Error with Message"
           },
@@ -163,7 +163,7 @@
          "id": "LedgerOperation1",
          "name": "LedgerOperation1",
          "activity": {
-          "ref": "github.com/TIBCOSoftware/honeycomb/flogo-contrib/extension/activity/ledger",
+          "ref": "github.com/TIBCOSoftware/dovetail/flogo-contrib/extension/activity/ledger",
           "input": {
            "model": "IOUDemo",
            "assetName": "com.tibco.cp.IOU",
@@ -200,7 +200,7 @@
          "id": "TransactionResponse",
          "name": "TransactionResponse",
          "activity": {
-          "ref": "github.com/TIBCOSoftware/honeycomb/flogo-contrib/extension/activity/txnreply",
+          "ref": "github.com/TIBCOSoftware/dovetail/flogo-contrib/extension/activity/txnreply",
           "input": {
            "status": "Success with Data",
            "dataType": "com.tibco.cp.IOU",
@@ -239,7 +239,7 @@
     ],
     "triggers": [
      {
-      "ref": "github.com/TIBCOSoftware/honeycomb/flogo-contrib/extension/trigger/transaction",
+      "ref": "github.com/TIBCOSoftware/dovetail/flogo-contrib/extension/trigger/transaction",
       "name": "SmartContractTXNTrigger",
       "description": "",
       "settings": {
