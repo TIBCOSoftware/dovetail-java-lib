@@ -27,7 +27,6 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 
 public class FlowCompiler {
-	final static String CHAINCODE_TRIGGER = "SmartContractTXNTrigger";
 	final static Pattern MAP_TO_ATTR_PATTERN = Pattern.compile("(\\$INPUT.\\$.\\$)?(\\['(?<name>\\w+)'\\])+?");
 	final static Pattern FUNCTION = Pattern.compile("[a-zA-Z]+\\.[a-zA-Z].*?\\(.*?\\)");
 	
