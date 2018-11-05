@@ -8,7 +8,6 @@ import java.util.Map;
 public class ActivityConfig
 {
     private String ref;
-
     private Map<String, Object> input;
     private TaskMappings mappings;
 

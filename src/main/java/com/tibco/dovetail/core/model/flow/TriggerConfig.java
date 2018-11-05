@@ -6,6 +6,11 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class TriggerConfig {
+	private String ref;
+	private String name;
+	private HandlerConfig[] handlers;
+	private Map<String, String> settings;
+	
 	public String getRef() {
 		return ref;
 	}
@@ -40,8 +45,4 @@ public class TriggerConfig {
 	public void setSettings(Map<String, String> settings) {
 		this.settings = settings;
 	}
-	private String ref;
-	private String name;
-	private HandlerConfig[] handlers;
-	private Map<String, String> settings;
 }

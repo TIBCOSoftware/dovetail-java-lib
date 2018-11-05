@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class TaskMapping {
     private String type;
-
     private Object value;
     private String mapTo;
 
