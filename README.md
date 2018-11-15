@@ -1,3 +1,7 @@
+---
+title: dovetail-java-lib
+weight: 4603
+---
 # dovetail-java-lib
 
 Project Dovetail™ Java library provides a runtime environment to interpret and execute smart contract flows developed using Project Dovetail™ Studio. It provides hooks to plugin any blockchain or distributed ledger platforms through a set of interfaces that must be implemented.
