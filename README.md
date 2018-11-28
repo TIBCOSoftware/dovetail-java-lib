@@ -24,7 +24,7 @@ Project Dovetail™ Java runtime supports JDK1.8+
 New contributions are welcome. If you would like to submit one, follow the instructions in the contributions section on the [documentation page](https://tibcosoftware.github.io/dovetail/contributing/contributing/)
 
 ## License
-dovetail-cli is licensed under a BSD-type license. See [LICENSE](https://github.com/TIBCOSoftware/dovetail-java-lib/blob/master/LICENSE) for license text.
+dovetail-java-lib is licensed under a BSD-type license. See [LICENSE](https://github.com/TIBCOSoftware/dovetail-java-lib/blob/master/LICENSE) for license text.
 
 ### Support
 For Q&A you can contact us at tibcolabs@tibco.com.
