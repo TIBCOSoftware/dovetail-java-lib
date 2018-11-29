@@ -18,6 +18,9 @@ Project Dovetail™ Java runtime dynamically loads activities and triggers in th
 
 Project Dovetail™ Java runtime supports JDK1.8+
 
+### Note on third party dependencies
+
+Once you install the java-lib the [following](./pom.xml) third party dependencies will be downloaded to your machine.
 
 ### Contributing
 
