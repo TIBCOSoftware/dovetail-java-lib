@@ -72,6 +72,12 @@ public class FlowCompiler {
 
     private static ActivityTask compileTask(ObjectMapper mapper, TasksConfig task) throws Exception{
         ActivityTask activityTask = new ActivityTask(task.getId());
+       
+        if(task.getType() != null && task.getType().equals("iterator")) {
+        		activityTask.setIteratorTask(true);
+        		activityTask.setIterateField(parseExpression(task.getSetting("iterate")));
+        }
+        
         activityTask.setActivityRef(task.getActivity().getRef());
         ActivityModel activityModel = ActivityModel.loadModel(mapper, activityTask.getActivityRef());
 

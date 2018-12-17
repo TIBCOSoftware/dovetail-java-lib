@@ -21,12 +21,16 @@ funcName				: NAME '.' NAME
 					;
 variable				: activity
 				    | flow
+				    | iteratorKey
+				    | iteratorValue
 				    | current
 				    | containerService
 					;
 					
 activity				: ('{{')? '$activity[' NAME '].' NAME ('.' NAME)* ('}}')?;
 flow					: ('{{')? '$flow.transactionInput.' NAME ('.' NAME)* ('}}')?;
+iteratorKey			: '$current.iteration.key';
+iteratorValue	    : '$current.iteration.value.' NAME ('.' NAME)*;
 current				: '$.' NAME ('.' NAME)*;
 containerService		: '$flow.containerServiceStub';
  

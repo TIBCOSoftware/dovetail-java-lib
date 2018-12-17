@@ -84,14 +84,59 @@ public class FlowEngine {
         ActivityTask activity = flow.getTask(id);
         if(activity == null)
             return;
+        
+        Context context = null;
+        if(activity.isIteratorTask()) {
+        		//get iterate object
+        		Object iterate = readValue(activity.getIterateField(), scope);
+        		if(iterate != null) {
+        			JSONArray vals = ((DocumentContext)iterate).json();
+        			DocumentContext output = JsonUtil.getJsonParser().parse("[]");
+        			for (int i=0; i<vals.size(); i++) {
+                		//set current scope variables
+        				scope.addVariable("$current", "key", i);
+        				scope.addVariable("$current", "value", vals.get(i));
+        				
+        				context = resolveInputs(activity);
+        				context = evalActivity(activity.getActivityRef(), context);
+        				
+        				//TODO: should check accumulation flag from UI
+        				if(context.getOutputs().size() > 0) {
+        					String rootV = "output";
+        					if(context.getOutputs().size() == 1) {
+        						Object[] keys = context.getOutputs().keySet().toArray();
+        						rootV = keys[0].toString();
+        						Object v = context.getOutput(rootV);
+        						if(v instanceof DocumentContext) {
+        							DocumentContext objv = (DocumentContext)v;
+        							output.add("$", objv.json());
+        						} else {
+        							output.add("$", v);
+        						}
+        					
+        					} else {
+        						//TODO: what is the root output name? default to output
+        						context.getOutputs().forEach((k, v) -> {
+	        						if(v instanceof DocumentContext) {
+	        							DocumentContext objv = (DocumentContext)v;
+	        							output.put("$", k, objv.json());
+	        						} else {
+	        							output.put("$", k, v);
+	        						}
+        						});
+        					}
+        					
+        					scope.addVariable("$activity", id + "." + rootV, output);
+        				}
+        			}
+        		}
+        		
+        }else {
+        		context = resolveInputs(activity);
+        		context = evalActivity(activity.getActivityRef(), context);
+        		context.getOutputs().forEach((k, v) -> scope.addVariable("$activity", id + "." + k, v));
+        }
 
-        //map input
-        Context context = resolveInputs(activity);
-
-        //TODO: iterator
-        context = evalActivity(activity.getActivityRef(), context);
-
-        context.getOutputs().forEach((k, v) -> scope.addVariable("$activity", id + "." + k, v));
     }
 
     private ContextImpl resolveInputs(ActivityTask activity){

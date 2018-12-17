@@ -7,10 +7,14 @@ package com.tibco.dovetail.core.runtime.flow;
 
 import java.util.HashMap;
 
+import org.antlr.v4.runtime.tree.ParseTree;
+
 public class ActivityTask {
     String taskId;
     String activityRef;
-    HashMap<String, Mapping> inputs = new HashMap<String, Mapping>();
+    boolean isIteratorTask = false;
+    ParseTree iterateField = null;
+	HashMap<String, Mapping> inputs = new HashMap<String, Mapping>();
     HashMap<String, Mapping> outputs = new HashMap<String, Mapping>();
 
     public ActivityTask(String taskId) {
@@ -53,4 +57,19 @@ public class ActivityTask {
         return outputs;
     }
 
+    public boolean isIteratorTask() {
+		return isIteratorTask;
+	}
+
+	public void setIteratorTask(boolean isIteratorTask) {
+		this.isIteratorTask = isIteratorTask;
+	}
+
+	public ParseTree getIterateField() {
+		return iterateField;
+	}
+
+	public void setIterateField(ParseTree iterateField) {
+		this.iterateField = iterateField;
+	}
 }

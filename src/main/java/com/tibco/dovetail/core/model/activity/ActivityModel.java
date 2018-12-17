@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tibco.dovetail.core.model.common.SimpleAttribute;
 import com.tibco.dovetail.core.runtime.flow.ActivityRegistry;
+import com.tibco.dovetail.core.runtime.util.ModelUtil;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -48,8 +49,7 @@ public class ActivityModel {
 
 
     public static ActivityModel loadModel(ObjectMapper mapper, String ref) throws Exception{
-    		String[] path = ref.split("/");
-        String clazz = "smartcontract.activity." + path[path.length-1] + "." + path[path.length-1];
+        String clazz = ModelUtil.getRefClassName(ref);
         InputStream isJson = Class.forName(clazz).getResourceAsStream("activity.json");
         if (isJson == null)
             throw new FileNotFoundException("activity.json file is not found for " + ref);

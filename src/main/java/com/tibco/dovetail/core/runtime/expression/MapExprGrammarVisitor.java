@@ -112,6 +112,18 @@ public interface MapExprGrammarVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitFlow(MapExprGrammarParser.FlowContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link MapExprGrammarParser#iteratorKey}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitIteratorKey(MapExprGrammarParser.IteratorKeyContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link MapExprGrammarParser#iteratorValue}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitIteratorValue(MapExprGrammarParser.IteratorValueContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link MapExprGrammarParser#current}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
