@@ -264,6 +264,20 @@ public class MapExprResolver extends MapExprGrammarBaseVisitor{
     	  		return null;
     	}
     
+    @Override public Integer visitIteratorKey(MapExprGrammarParser.IteratorKeyContext ctx) { 
+    		return (int) scope.getVariable("$current", "key"); 
+    	}
+	
+	@Override public Object visitIteratorValue(MapExprGrammarParser.IteratorValueContext ctx) { 
+		Object value = scope.getVariable("$current", "value");
+		if (value != null ) {
+			List<TerminalNode> names = ctx.NAME();
+    	  		String path = names.stream().map(n -> n.getText()).collect(Collectors.joining("."));
+    	  		return readValue(value, path);
+		} else 
+			return null;
+	}
+
 }
 
 

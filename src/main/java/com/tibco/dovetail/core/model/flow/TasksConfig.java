@@ -5,6 +5,8 @@
  */
 package com.tibco.dovetail.core.model.flow;
 
+import java.util.Map;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -12,6 +14,8 @@ public class TasksConfig
 {
     private String id;
     private String name;
+    private String type = null;
+    private Map<String, String> settings;
     private ActivityConfig activity;
 
     public String getId ()
@@ -43,5 +47,25 @@ public class TasksConfig
     {
         this.activity = activity;
     }
+    
+    public Map<String, String> getSettings() {
+		return settings;
+	}
+
+    public String getSetting(String key) {
+		return settings.get(key);
+	}
+    
+	public void setSettings(Map<String, String> settings) {
+		this.settings = settings;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
 
 }

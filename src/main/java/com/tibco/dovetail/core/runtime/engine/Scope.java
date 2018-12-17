@@ -21,6 +21,7 @@ public class Scope {
     private Map<String, Object> activity = new HashMap<String, Object>();
     private Map<String, Object> flow = new HashMap<String, Object>();
     private Map<String, Object> local = new HashMap<String, Object>();
+    private Map<String, Object> current = new HashMap<String, Object>();
     
     private Map<String, Map<String, Object>> scopes;
 
@@ -29,6 +30,7 @@ public class Scope {
         scopes.put(Scope.SCOPE_ACTIVITY, activity);
         scopes.put(Scope.SCOPE_FLOW, flow);
         scopes.put(Scope.SCOPE_LOCAL, local);
+        scopes.put(Scope.SCOPE_CURRENT, current);
     }
 
     public Scope(Scope parentScope) {
@@ -50,6 +52,12 @@ public class Scope {
     			val = getVariable(Scope.SCOPE_FLOW, var.substring(6));
     		} else if(var.startsWith(Scope.SCOPE_ACTIVITY)) {
     			val = getVariable(Scope.SCOPE_ACTIVITY, var.substring(10));
+    		} else if(var.startsWith(Scope.SCOPE_CURRENT)) {
+    			if(var.equals("$current.iteration.key")) {
+    				val = getVariable(Scope.SCOPE_CURRENT, "key");
+    			} else {
+    				val = getVariable(Scope.SCOPE_CURRENT, "value");
+    			}
     		} else {
     			val = getVariable(Scope.SCOPE_LOCAL, "from");
     		}
