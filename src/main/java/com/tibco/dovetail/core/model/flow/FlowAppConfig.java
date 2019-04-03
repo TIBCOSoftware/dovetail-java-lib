@@ -8,7 +8,7 @@ package com.tibco.dovetail.core.model.flow;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -21,7 +21,7 @@ public class FlowAppConfig {
     private String name;
     private String type;
     private String description;
-    private Map<String, Resources> resources = new HashMap<String, Resources>();
+    private Map<String, Resources> resources = new LinkedHashMap<String, Resources>();
     private TriggerConfig[] triggers;
 
     public static FlowAppConfig parseModel(InputStream jsonModel) throws JsonParseException, JsonMappingException, IOException {

@@ -5,7 +5,7 @@
  */
 package com.tibco.dovetail.core.runtime.flow;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import org.antlr.v4.runtime.tree.ParseTree;
 
@@ -14,8 +14,8 @@ public class ActivityTask {
     String activityRef;
     boolean isIteratorTask = false;
     ParseTree iterateField = null;
-	HashMap<String, Mapping> inputs = new HashMap<String, Mapping>();
-    HashMap<String, Mapping> outputs = new HashMap<String, Mapping>();
+	LinkedHashMap<String, Mapping> inputs = new LinkedHashMap<String, Mapping>();
+    LinkedHashMap<String, Mapping> outputs = new LinkedHashMap<String, Mapping>();
 
     public ActivityTask(String taskId) {
         this.taskId = taskId;
@@ -49,11 +49,11 @@ public class ActivityTask {
         this.outputs.put(name, a);
     }
 
-    public HashMap<String, Mapping> getInputs() {
+    public LinkedHashMap<String, Mapping> getInputs() {
         return inputs;
     }
 
-    public HashMap<String, Mapping> getOutputs() {
+    public LinkedHashMap<String, Mapping> getOutputs() {
         return outputs;
     }
 

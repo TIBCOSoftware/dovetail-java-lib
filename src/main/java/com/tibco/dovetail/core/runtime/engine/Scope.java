@@ -6,7 +6,7 @@
 package com.tibco.dovetail.core.runtime.engine;
 
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class Scope {
@@ -18,15 +18,15 @@ public class Scope {
 	public final static String SCOPE_LOCAL = "$.";
 	
     Scope parent = null;
-    private Map<String, Object> activity = new HashMap<String, Object>();
-    private Map<String, Object> flow = new HashMap<String, Object>();
-    private Map<String, Object> local = new HashMap<String, Object>();
-    private Map<String, Object> current = new HashMap<String, Object>();
+    private Map<String, Object> activity = new LinkedHashMap<String, Object>();
+    private Map<String, Object> flow = new LinkedHashMap<String, Object>();
+    private Map<String, Object> local = new LinkedHashMap<String, Object>();
+    private Map<String, Object> current = new LinkedHashMap<String, Object>();
     
     private Map<String, Map<String, Object>> scopes;
 
     public Scope(){
-        scopes = new HashMap<String, Map<String, Object>>() ;
+        scopes = new LinkedHashMap<String, Map<String, Object>>() ;
         scopes.put(Scope.SCOPE_ACTIVITY, activity);
         scopes.put(Scope.SCOPE_FLOW, flow);
         scopes.put(Scope.SCOPE_LOCAL, local);

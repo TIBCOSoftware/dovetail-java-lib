@@ -9,14 +9,14 @@ import com.tibco.dovetail.core.model.common.SimpleAttribute;
 import com.tibco.dovetail.core.runtime.transaction.TxnInputAttribute;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 public class BasicTransactionFlow {
 	
     private Node root;
-    private Map<String, ActivityTask> tasks = new HashMap<String, ActivityTask>();
+    private Map<String, ActivityTask> tasks = new LinkedHashMap<String, ActivityTask>();
     private List<TxnInputAttribute> flowInputs = new ArrayList<TxnInputAttribute>();
     private List<SimpleAttribute> flowOutputs = new ArrayList<SimpleAttribute>();
 

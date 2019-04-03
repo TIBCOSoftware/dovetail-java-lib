@@ -12,8 +12,15 @@ public class SimpleAttribute {
     protected String name;
     protected String type;
     protected Object value = null;
+    protected String schema = null;
 
-    public void setName(String name) {
+    public String getSchema() {
+		return schema;
+	}
+	public void setSchema(String schema) {
+		this.schema = schema;
+	}
+	public void setName(String name) {
         this.name = name;
     }
     public void setType(String type) {

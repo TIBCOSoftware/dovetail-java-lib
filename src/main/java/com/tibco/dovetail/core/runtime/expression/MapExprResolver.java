@@ -16,6 +16,7 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -197,14 +198,23 @@ public class MapExprResolver extends MapExprGrammarBaseVisitor{
     public Object visitActivity(MapExprGrammarParser.ActivityContext ctx) {
         List<TerminalNode> names = ctx.NAME();
 
-        Object value = scope.getVariable("$activity", names.get(0).getText() + "." + names.get(1).getText());
-
+        String var = names.get(1).getText().trim();
+        int element = -1;
+        if(var.endsWith("]")) {
+	    		int idx = var.indexOf("[");
+	    		element = Integer.parseInt(var.substring(idx+1, var.length()-1));
+	    		var = var.substring(0, idx);
+        }
+        Object value = scope.getVariable("$activity", names.get(0).getText() + "." + var);
+        if(element >= 0 && value instanceof ArrayList)
+			value = ((ArrayList)value).get(element);
+        
         if(names.size() > 2){
             String path = names.subList(2, names.size()).stream().map(it-> it.getText()).collect(Collectors.joining("."));
             value = readValue(value, path);
         }
 
-        return value;
+    		return value;
     }
 
     private Object readValue(Object v, String path){

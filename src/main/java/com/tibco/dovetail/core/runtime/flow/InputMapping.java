@@ -14,6 +14,10 @@ package com.tibco.dovetail.core.runtime.flow;
  * otherwise, literal or assignment - Object
  */
 public class InputMapping implements Mapping{
+	/**
+	 * 
+	 */
+
 	private Object mappingValue;
     private ValueMappingType mappingType;
     

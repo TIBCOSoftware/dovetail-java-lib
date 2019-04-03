@@ -10,11 +10,12 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class HandlerConfig {
-	private Map<String, String> settings;
+	private Map<String, Object> settings;
 	private Output outputs;  
 	private Action action;
 	private Resources flowResource;
 	private String flowId;
+	private String flowName;
 	
 	 public String getFlowURI() {
 		 if(this.action != null && this.action.data != null) {
@@ -34,7 +35,7 @@ public class HandlerConfig {
 		
 	 }
 	 
-	 public String getSetting(String name) {
+	 public Object getSetting(String name) {
 		 if(this.settings != null ) {
 			 return this.settings.get(name);
 		 } else {
@@ -46,6 +47,7 @@ public class HandlerConfig {
 	 public void setFlow(String flowId, Resources r) {
 		 this.flowId = flowId;
 		 this.flowResource = r;
+		 this.flowName = flowId.substring(5);
 	 }
 	 
 	 public Resources getFlow() {
@@ -56,11 +58,15 @@ public class HandlerConfig {
 		 return this.flowId;
 	 }
 	 
-	 public Map<String, String> getSettings() {
+	 public String getFlowName() {
+		 return this.flowName;
+	 }
+	 
+	 public Map<String, Object> getSettings() {
 		return settings;
 	}
 
-	public void setSettings(Map<String, String> settings) {
+	public void setSettings(Map<String, Object> settings) {
 		this.settings = settings;
 	}
 

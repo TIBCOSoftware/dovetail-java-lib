@@ -5,12 +5,19 @@
  */
 package com.tibco.dovetail.core.runtime.trigger;
 
+import java.util.Map;
+
 import com.tibco.dovetail.core.model.flow.TriggerConfig;
 import com.tibco.dovetail.core.runtime.flow.ReplyData;
+import com.tibco.dovetail.core.runtime.flow.TransactionFlow;
 import com.tibco.dovetail.core.runtime.services.IContainerService;
 import com.tibco.dovetail.core.runtime.transaction.ITransactionService;
 
+
 public interface ITrigger {
-	public void Initialize(TriggerConfig triggerConfig);
+	//return a map to look up table for the trigger
+	public Map<String, ITrigger> Initialize(TriggerConfig triggerConfig);
+
 	public ReplyData invoke(IContainerService stub, ITransactionService txn);
+	TransactionFlow getHandler(String name);
 }

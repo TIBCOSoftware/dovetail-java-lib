@@ -5,6 +5,7 @@
  */
 package com.tibco.dovetail.core.runtime.flow;
 
+import com.tibco.dovetail.core.runtime.expression.ErrorListener;
 import com.tibco.dovetail.core.runtime.expression.MapExprGrammarLexer;
 import com.tibco.dovetail.core.runtime.expression.MapExprGrammarParser;
 import org.antlr.v4.runtime.CharStreams;
@@ -54,10 +55,12 @@ public class Link {
             InputStream stream = new ByteArrayInputStream(mapping.getBytes(StandardCharsets.UTF_8));
 
             MapExprGrammarLexer lexer = new MapExprGrammarLexer(CharStreams.fromStream(stream, StandardCharsets.UTF_8));
-
+            lexer.removeErrorListeners();
+	        lexer.addErrorListener(new ErrorListener());
             CommonTokenStream tokens = new CommonTokenStream(lexer);
 
             MapExprGrammarParser parser = new MapExprGrammarParser(tokens);
+           
             stream.close();
             return parser.condition();
         }catch (Exception e){

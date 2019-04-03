@@ -30,6 +30,7 @@ import com.tibco.dovetail.core.runtime.services.IContainerService;
 import com.tibco.dovetail.core.runtime.services.ILogService;
 import com.tibco.dovetail.core.runtime.util.JsonUtil;
 
+import co.paralleluniverse.fibers.Suspendable;
 import net.minidev.json.JSONArray;
 
 public class FlowEngine {
@@ -72,11 +73,11 @@ public class FlowEngine {
         //invoke model
         invokeTask(n.getTaskId());
 
-        n.getToLinks().forEach(l -> {
+        for(Link l : n.getToLinks()){
             if(eval(l)){
                 runNode(l.getNextNode());
             }
-        });
+        };
     }
 
     private void invokeTask(String id){
@@ -97,7 +98,7 @@ public class FlowEngine {
         				scope.addVariable("$current", "key", i);
         				scope.addVariable("$current", "value", vals.get(i));
         				
-        				context = resolveInputs(activity);
+        				context = resolveInputs(activity);	
         				context = evalActivity(activity.getActivityRef(), context);
         				
         				//TODO: should check accumulation flag from UI
@@ -144,6 +145,7 @@ public class FlowEngine {
         ContextImpl context = new ContextImpl();
         context.setContainerService(this.container);
         context.setReplyHandler(replyHandler);
+        context.addInput("__properties__", flow.getProperties());
 
         activity.getInputs().forEach((k, v) -> {
             if(v.getMappingType() == null){
@@ -304,21 +306,6 @@ public class FlowEngine {
             default:
             		throw new RuntimeException("mapping type " + mapType + " is not supported");
             }
-            /*
-            if(objmap instanceof ParseTree) {
-	            Object value = readValue((ParseTree)mapping.get(k), lclscope);
-	            //check/create nested objects
-	            if (value instanceof DocumentContext)
-	            		doc = setAttrValue(doc, parentPath, k, ((DocumentContext)value).json());    
-	            else 
-	            		doc = setAttrValue(doc, parentPath, k, value);
-            } else if (objmap instanceof Map) {
-            		List<LinkedHashMap<String, Object>> value = createArrayObject(scope, (Map<String, Object>)objmap);
-            		doc = setAttrValue(doc, parentPath, k, value);
-            } else {
-            	//literal mapping
-            		doc = setAttrValue(doc, parentPath, k, objmap);
-            }*/
         }
 
         return doc;
@@ -352,7 +339,7 @@ public class FlowEngine {
         MapExprResolver visitor = new MapExprResolver(lclscope);
         return visitor.visit(mapping);
     }
-
+    @Suspendable
     private Context evalActivity(String activityRef, Context context) {
         IActivity activity = ActivityRegistry.getActivityInstance(activityRef);
         activity.eval(context);

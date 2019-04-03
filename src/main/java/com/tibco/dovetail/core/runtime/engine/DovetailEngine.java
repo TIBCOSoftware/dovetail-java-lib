@@ -5,6 +5,8 @@
  */
 package com.tibco.dovetail.core.runtime.engine;
 
+import java.util.LinkedHashMap;
+
 import com.tibco.dovetail.core.model.flow.FlowAppConfig;
 import com.tibco.dovetail.core.model.flow.TriggerConfig;
 import com.tibco.dovetail.core.runtime.trigger.ITrigger;
@@ -15,7 +17,7 @@ import com.tibco.dovetail.core.runtime.util.ModelUtil;
 
 public class DovetailEngine {
     
-    private ITrigger trigger = null;
+    private LinkedHashMap<String, ITrigger> triggers = new LinkedHashMap<String, ITrigger>();
 
     public DovetailEngine(FlowAppConfig app) throws InstantiationException, IllegalAccessException, ClassNotFoundException {
     	 // triggers
@@ -23,17 +25,27 @@ public class DovetailEngine {
 	    if(triggerConfigs == null || triggerConfigs.length == 0)
 	    		throw new RuntimeException("There is no trigger defined in the application");
 	    
+	    
+	   /*  comment out to support multiple triggers
 	    if(triggerConfigs.length >1)
 				throw new RuntimeException("Each application can have only one type of trigger");
 	    
-	
-		String ref = triggerConfigs[0].getRef();
-        	String clazz = ModelUtil.getRefClassName(ref);
-        	trigger = TriggerFactory.createTrigger(clazz); 
-        	trigger.Initialize(triggerConfigs[0]);
+	*/
+	    for (int i=0; i<triggerConfigs.length; i++) {
+			String ref = triggerConfigs[i].getRef();
+	        	String clazz = ModelUtil.getRefClassName(ref);
+	        ITrigger	trigger = TriggerFactory.createTrigger(clazz); 
+	        	triggers.putAll(trigger.Initialize(triggerConfigs[i]));
+	    }
+        	
     	}
     
-   public ITrigger getTrigger() {
-	   return this.trigger;
+    //by txn or flow name
+   public ITrigger getTrigger(String lookup) {
+	   return this.triggers.get(lookup);
+   }
+   
+   public LinkedHashMap<String, ITrigger> getTriggers(){
+	   return this.triggers;
    }
 }

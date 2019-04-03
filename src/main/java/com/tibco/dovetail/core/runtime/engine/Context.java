@@ -8,12 +8,12 @@ package com.tibco.dovetail.core.runtime.engine;
 import com.tibco.dovetail.core.runtime.flow.ReplyHandler;
 import com.tibco.dovetail.core.runtime.services.IContainerService;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 abstract public class Context {
-    protected Map<String, Object> inputs = new HashMap<>();
-    private Map<String, Object> outputs = new HashMap<>();
+    protected Map<String, Object> inputs = new LinkedHashMap<>();
+    private Map<String, Object> outputs = new LinkedHashMap<>();
     protected IContainerService containerService;
     protected ReplyHandler reply;
 
