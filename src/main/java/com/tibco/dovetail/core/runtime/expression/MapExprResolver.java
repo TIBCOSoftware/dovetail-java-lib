@@ -7,9 +7,9 @@ package com.tibco.dovetail.core.runtime.expression;
 
 import com.jayway.jsonpath.DocumentContext;
 import com.tibco.dovetail.core.runtime.engine.Scope;
-import com.tibco.dovetail.core.runtime.function.string;
 import com.tibco.dovetail.core.runtime.util.CompareUtil;
 import com.tibco.dovetail.core.runtime.util.JsonUtil;
+import com.tibco.dovetail.function.string;
 
 import net.minidev.json.JSONArray;
 import org.antlr.v4.runtime.tree.TerminalNode;
@@ -86,7 +86,7 @@ public class MapExprResolver extends MapExprGrammarBaseVisitor{
             		return function;
             }
             
-            Class clazz = Class.forName("com.tibco.dovetail.core.runtime.function." + fn[0]);
+            Class clazz = Class.forName("com.tibco.dovetail.function." + fn[0]);
             Method[] methods = clazz.getDeclaredMethods();
 
             for(Method method : methods){
@@ -104,8 +104,12 @@ public class MapExprResolver extends MapExprGrammarBaseVisitor{
                                                     .collect(Collectors.toList());
                     if(method.isVarArgs())
                     		return method.invoke(null, (Object)args.toArray());
-                    else
+                    else if(method.getParameterCount() > 1)
                     		return method.invoke(null, args.toArray());
+                    else if (method.getParameterCount() == 1)
+                    		return method.invoke(null, args.get(0));
+                    else
+                    		return method.invoke(null);
                 }
             }
 
@@ -117,7 +121,8 @@ public class MapExprResolver extends MapExprGrammarBaseVisitor{
 
     @Override
     public Object visitStringAtomExp(MapExprGrammarParser.StringAtomExpContext ctx) {
-        return ctx.STRING().getText();
+        String s = ctx.STRING().getText();
+        return s.substring(1, s.length()-1);
     }
 
     @Override

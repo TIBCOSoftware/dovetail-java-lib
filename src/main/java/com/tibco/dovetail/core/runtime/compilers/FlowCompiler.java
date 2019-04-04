@@ -137,20 +137,21 @@ public class FlowCompiler {
                 }
                 
                 switch(mappingType) {
+                		case literal:
+                			map.setMappingType(AttributeMapping.ValueMappingType.literal);
+		        			map.setMappingValue(mappingValue);
+		        			break;
 		    	        case array:
 		    	            Map<String, Object> arraymap = mapper.readValue(mappingValue.toString(), new TypeReference<Map<String, Object>>(){} ); 
 		    	        		map.setMappingType(AttributeMapping.ValueMappingType.array);
 		    	        		map.setMappingValue(parseArrayMapping(arraymap));
 		    	            break;
+		    	        case assign:
 		    	        case expression:
 		    	        	 	if(a.getType().equals("any")) {
 		    	        	 		map.setMappingType(AttributeMapping.ValueMappingType.assign);
 		    	        	 		map.setMappingValue(mappingValue);
 		    	        	 	}
-		    		       /* 	if(mappingValue.equals("$flow.containerServiceStub")) {
-		    		        		map.setMappingType(AttributeMapping.ValueMappingType.assign);
-		    		        		map.setMappingValue(mappingValue);
-		    		        	}*/
 		    		        else {
 		    		        		String mapexpr = mappingValue.toString();
 		    		        		if(Scope.isScopeVariable(mapexpr) || isFunctionMapping(mapexpr)) {
@@ -162,6 +163,7 @@ public class FlowCompiler {
 		    		        		}
 		    		        }
 		    		        	break;
+		    	        	
 		    		    default:
 		    		    		throw new IllegalArgumentException("Unsupported mapping type " + mappingType);
 		        }

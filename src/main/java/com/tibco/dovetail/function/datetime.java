@@ -3,7 +3,7 @@
 * This file is subject to the license terms contained
 * in the license file that is distributed with this file.
  */
-package com.tibco.dovetail.core.runtime.function;
+package com.tibco.dovetail.function;
 
 public class datetime {
 }

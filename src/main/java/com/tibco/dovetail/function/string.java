@@ -3,7 +3,7 @@
 * This file is subject to the license terms contained
 * in the license file that is distributed with this file.
  */
-package com.tibco.dovetail.core.runtime.function;
+package com.tibco.dovetail.function;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -11,7 +11,19 @@ import java.util.stream.Collectors;
 
 public class string {
     public static String concat(Object ...arg){
-        return Arrays.asList(arg).stream().map(it -> it.toString()).collect(Collectors.joining());
+        return Arrays.asList(arg).stream().map(o -> o.toString()).collect(Collectors.joining());
+    }
+   
+    public static String tostring(Object arg){
+        return arg.toString();
+    }
+    
+    public static String lowerCase(String arg){
+        return arg.toLowerCase();
+    }
+    
+    public static String upperCase(String arg){
+        return arg.toUpperCase();
     }
     
     public static String concatWithDelimiter(String delimiter, Collection<Object> arg2){
