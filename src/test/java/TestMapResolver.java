@@ -11,8 +11,6 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.google.common.collect.Lists;
-import com.tibco.dovetail.core.runtime.expression.ErrorListener;
 import com.tibco.dovetail.core.runtime.expression.MapExprGrammarLexer;
 import com.tibco.dovetail.core.runtime.expression.MapExprGrammarParser;
 import com.tibco.dovetail.core.runtime.expression.MapExprResolver;
@@ -61,8 +59,6 @@ public class TestMapResolver {
 	    try {
 	        stream = new ByteArrayInputStream(s.getBytes(StandardCharsets.UTF_8));
 	        MapExprGrammarLexer lexer = new MapExprGrammarLexer(CharStreams.fromStream(stream, StandardCharsets.UTF_8));
-	        lexer.removeErrorListeners();
-	        lexer.addErrorListener(new ErrorListener());
 	        CommonTokenStream tokens = new CommonTokenStream(lexer);
 	        MapExprGrammarParser parser = new MapExprGrammarParser(tokens);
 	      

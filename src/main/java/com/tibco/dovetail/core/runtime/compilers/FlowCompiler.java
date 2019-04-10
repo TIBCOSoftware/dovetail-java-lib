@@ -11,7 +11,6 @@ import com.tibco.dovetail.core.model.activity.ActivityModel;
 import com.tibco.dovetail.core.model.common.SimpleAttribute;
 import com.tibco.dovetail.core.model.flow.*;
 import com.tibco.dovetail.core.runtime.engine.Scope;
-import com.tibco.dovetail.core.runtime.expression.ErrorListener;
 import com.tibco.dovetail.core.runtime.expression.MapExprGrammarLexer;
 import com.tibco.dovetail.core.runtime.expression.MapExprGrammarParser;
 import com.tibco.dovetail.core.runtime.flow.*;
@@ -155,7 +154,7 @@ public class FlowCompiler {
 		    		        else {
 		    		        		String mapexpr = mappingValue.toString();
 		    		        		if(Scope.isScopeVariable(mapexpr) || isFunctionMapping(mapexpr)) {
-		    		        			map.setMappingType(mappingType);
+		    		        			map.setMappingType(AttributeMapping.ValueMappingType.expression);
 		    		        			map.setMappingValue(parseExpression(mappingValue.toString()));
 		    		        		} else {
 		    		        			map.setMappingType(AttributeMapping.ValueMappingType.literal);
@@ -225,8 +224,6 @@ public class FlowCompiler {
 	    try {
 	        stream = new ByteArrayInputStream(mapping.getBytes(StandardCharsets.UTF_8));
 	        MapExprGrammarLexer lexer = new MapExprGrammarLexer(CharStreams.fromStream(stream, StandardCharsets.UTF_8));
-	        lexer.removeErrorListeners();
-	        lexer.addErrorListener(new ErrorListener());
 	        CommonTokenStream tokens = new CommonTokenStream(lexer);
 	        MapExprGrammarParser parser = new MapExprGrammarParser(tokens);
 	      

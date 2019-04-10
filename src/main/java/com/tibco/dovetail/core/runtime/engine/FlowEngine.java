@@ -258,7 +258,12 @@ public class FlowEngine {
 	    					top = (LinkedHashMap<String, Object>) chld;
 	    				}
 	    				
-	    				if(fieldmap.get("type").toString().equals("primitive")) {
+	    				if(fieldmap.get("type").toString().equalsIgnoreCase("foreach") || fieldmap.get("type").toString().equalsIgnoreCase("NEWARRAY")) {
+	    					//foreach and NEWARRAY
+	    					List<LinkedHashMap<String, Object>> value = createArrayObject(lclscope, fieldmap);
+	    					top.put(tokens[tokens.length-1], value);
+	    					
+	    				} else {
 	    					Object mapObj = fieldmap.get("from");
 	    					if(mapObj instanceof ParseTree) {
 	    						top.put(tokens[tokens.length-1], readValue((ParseTree)fieldmap.get("from"), lclscope));
@@ -266,10 +271,6 @@ public class FlowEngine {
 	    						//literal mapping
 	    						top.put(tokens[tokens.length-1], mapObj);
 	    					}
-	    				} else {
-	    					//foreach and NEWARRAY
-	    					List<LinkedHashMap<String, Object>> value = createArrayObject(lclscope, fieldmap);
-	    					top.put(tokens[tokens.length-1], value);
 	    				} 
 	    			}	
 	    		}
