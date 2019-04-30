@@ -146,7 +146,7 @@ public class FlowCompiler {
 		    		        else {
 		    		        		String mapexpr = mappingValue.toString();
 		    		        		if(Scope.isScopeVariable(mapexpr) || isFunctionMapping(mapexpr)) {
-		    		        			map.setMappingType(mappingType);
+		    		        			map.setMappingType(AttributeMapping.ValueMappingType.expression);
 		    		        			map.setMappingValue(parseExpression(mappingValue.toString()));
 		    		        		} else {
 		    		        			map.setMappingType(AttributeMapping.ValueMappingType.literal);
