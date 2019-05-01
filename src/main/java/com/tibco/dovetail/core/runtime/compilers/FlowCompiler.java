@@ -21,7 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -85,9 +85,10 @@ public class FlowCompiler {
         Map<String, Object> input = task.getActivity().getInput();
         if(input != null) {
             for (String attr : input.keySet()){
-                SimpleAttribute a = getActivityInputAttribute(activityModel, attr);
-                InputMapping inputMapping = new InputMapping();
+                SimpleAttribute a = getActivityInputAttribute(activityModel, attr);    		
+                InputMapping inputMapping = new InputMapping();      
                 inputMapping.setMappingType(Mapping.ValueMappingType.literal);
+                
                 inputMapping.setMappingValue(task.getActivity().getInput().get(attr));
                 activityTask.addInput(a.getName(), inputMapping);
             }
@@ -100,11 +101,11 @@ public class FlowCompiler {
             		ArrayList<String> names = getInputAttrName(MAP_TO_ATTR_PATTERN, mapping.getMapTo());
                  Object mappingValue = mapping.getValue();
                  ValueMappingType mappingType = AttributeMapping.ValueMappingType.valueOf(mapping.getType());
+                 SimpleAttribute a = getActivityInputAttribute(activityModel, names.get(0));
                  
             		//find top level attribute object mapping
                 Mapping root = activityTask.getInput(names.get(0));
                 if (root == null) {
-                	   SimpleAttribute a = getActivityInputAttribute(activityModel, names.get(0));
                     root = new InputMapping();
                     
                     activityTask.addInput(names.get(0), root);
@@ -113,7 +114,7 @@ public class FlowCompiler {
                 //first time
                 if(root.getMappingType() != Mapping.ValueMappingType.object && names.size() > 1) {
             			root.setMappingType(Mapping.ValueMappingType.object);
-            			root.setMappingValue(new HashMap<String, AttributeMapping>());
+            			root.setMappingValue(new LinkedHashMap<String, AttributeMapping>());
                 }
                 
                 Mapping map = root;
@@ -127,20 +128,25 @@ public class FlowCompiler {
                 }
                 
                 switch(mappingType) {
+                		case literal:
+                			map.setMappingType(AttributeMapping.ValueMappingType.literal);
+		        			map.setMappingValue(mappingValue);
+		        			break;
 		    	        case array:
 		    	            Map<String, Object> arraymap = mapper.readValue(mappingValue.toString(), new TypeReference<Map<String, Object>>(){} ); 
 		    	        		map.setMappingType(AttributeMapping.ValueMappingType.array);
 		    	        		map.setMappingValue(parseArrayMapping(arraymap));
 		    	            break;
+		    	        case assign:
 		    	        case expression:
-		    		        	if(mappingValue.equals("$flow.containerServiceStub")) {
-		    		        		map.setMappingType(AttributeMapping.ValueMappingType.assign);
-		    		        		map.setMappingValue(mappingValue);
-		    		        	}
+		    	        	 	if(a.getType().equals("any")) {
+		    	        	 		map.setMappingType(AttributeMapping.ValueMappingType.assign);
+		    	        	 		map.setMappingValue(mappingValue);
+		    	        	 	}
 		    		        else {
 		    		        		String mapexpr = mappingValue.toString();
 		    		        		if(Scope.isScopeVariable(mapexpr) || isFunctionMapping(mapexpr)) {
-		    		        			map.setMappingType(mappingType);
+		    		        			map.setMappingType(AttributeMapping.ValueMappingType.expression);
 		    		        			map.setMappingValue(parseExpression(mappingValue.toString()));
 		    		        		} else {
 		    		        			map.setMappingType(AttributeMapping.ValueMappingType.literal);
@@ -148,6 +154,7 @@ public class FlowCompiler {
 		    		        		}
 		    		        }
 		    		        	break;
+		    	        	
 		    		    default:
 		    		    		throw new IllegalArgumentException("Unsupported mapping type " + mappingType);
 		        }
@@ -159,7 +166,7 @@ public class FlowCompiler {
     }
     private static Node compileLinks(LinksConfig[] links){
         Node root = null;
-        Map<String, Node> nodes = new HashMap<String, Node>();
+        Map<String, Node> nodes = new LinkedHashMap<String, Node>();
         for(LinksConfig l : links){
             String from = l.getFrom();
             String to = l.getTo();
@@ -211,7 +218,9 @@ public class FlowCompiler {
 	        MapExprGrammarLexer lexer = new MapExprGrammarLexer(CharStreams.fromStream(stream, StandardCharsets.UTF_8));
 	        CommonTokenStream tokens = new CommonTokenStream(lexer);
 	        MapExprGrammarParser parser = new MapExprGrammarParser(tokens);
+	      
 	        ParseTree tree = parser.expression();
+	       
 	        return tree;
 	    }catch (Exception e){
 	        throw new RuntimeException("parseExpression error: " + mapping, e);
