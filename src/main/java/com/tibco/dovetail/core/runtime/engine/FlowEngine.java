@@ -56,6 +56,9 @@ public class FlowEngine {
             flowInputs.forEach((k, v) -> scope.addVariable("$flow", k, v));
 
             Node root = flow.getRoot();
+            if(root == null)
+            		return new ReplyData("Success", null, null);
+            
             runNode(root);
         }catch (Exception e){
             if(flow.getErrorHandler() != null){

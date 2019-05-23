@@ -131,7 +131,7 @@ public class math {
    		return bd.divide(new BigDecimal(params.length), context).toPlainString();
    }
    	
-   	public static Long subtract(Object ...params){
+   	public static Long subtractLong(Object ...params){
    		Long result = Long.valueOf(params[0].toString());
    		for(int i=1; i<params.length; i++) {
    			result = java.lang.Math.subtractExact(result, Long.valueOf(params[i].toString()));

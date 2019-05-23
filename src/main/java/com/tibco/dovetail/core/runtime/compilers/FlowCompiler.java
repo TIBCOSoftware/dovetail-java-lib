@@ -59,10 +59,10 @@ public class FlowCompiler {
 
         //links
         Node root = compileLinks(data.getLinks());
-        if (data.getTasks().length == 0) {
+    /*    if (data.getTasks().length == 0) {
         		throw new RuntimeException("There is no activity in the flow");
         }
-        
+        */
         if(root == null && data.getTasks().length > 0) {
         		root = new Node(data.getTasks()[0].getId());
         }
