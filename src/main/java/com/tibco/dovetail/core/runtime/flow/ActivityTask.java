@@ -14,8 +14,8 @@ public class ActivityTask {
     String activityRef;
     boolean isIteratorTask = false;
     ParseTree iterateField = null;
-	LinkedHashMap<String, Mapping> inputs = new LinkedHashMap<String, Mapping>();
-    LinkedHashMap<String, Mapping> outputs = new LinkedHashMap<String, Mapping>();
+	LinkedHashMap<String, AttributeMapping> inputs = new LinkedHashMap<String, AttributeMapping>();
+    LinkedHashMap<String, AttributeMapping> outputs = new LinkedHashMap<String, AttributeMapping>();
 
     public ActivityTask(String taskId) {
         this.taskId = taskId;
@@ -33,27 +33,27 @@ public class ActivityTask {
         this.activityRef = activityRef;
     }
 
-    public Mapping getInput(String name){
+    public AttributeMapping getInput(String name){
         return inputs.get(name);
     }
 
-    public Mapping getOutput(String name){
+    public AttributeMapping getOutput(String name){
         return outputs.get(name);
     }
 
-    public void addInput(String name, Mapping a){
+    public void addInput(String name, AttributeMapping a){
         this.inputs.put(name, a);
     }
 
-    public void addOutput(String name, Mapping a){
+    public void addOutput(String name, AttributeMapping a){
         this.outputs.put(name, a);
     }
 
-    public LinkedHashMap<String, Mapping> getInputs() {
+    public LinkedHashMap<String, AttributeMapping> getInputs() {
         return inputs;
     }
 
-    public LinkedHashMap<String, Mapping> getOutputs() {
+    public LinkedHashMap<String, AttributeMapping> getOutputs() {
         return outputs;
     }
 

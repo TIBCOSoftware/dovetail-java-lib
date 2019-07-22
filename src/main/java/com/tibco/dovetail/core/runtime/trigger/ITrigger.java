@@ -13,11 +13,14 @@ import com.tibco.dovetail.core.runtime.flow.TransactionFlow;
 import com.tibco.dovetail.core.runtime.services.IContainerService;
 import com.tibco.dovetail.core.runtime.transaction.ITransactionService;
 
+import co.paralleluniverse.fibers.Suspendable;
+
 
 public interface ITrigger {
 	//return a map to look up table for the trigger
 	public Map<String, ITrigger> Initialize(TriggerConfig triggerConfig);
 
+	@Suspendable
 	public ReplyData invoke(IContainerService stub, ITransactionService txn);
 	TransactionFlow getHandler(String name);
 }

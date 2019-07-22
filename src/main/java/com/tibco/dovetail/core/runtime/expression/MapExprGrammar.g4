@@ -5,7 +5,7 @@ condition			: '(' condition ')'													#parenthesisCond
 					| atomexpr ((EQUAL | NOTEQUAL | GT | LT | GE | LE) atomexpr)?			#condExp														
 					;
 					
-atomexpr          	: funcName '(' atomexpr (',' atomexpr)* ')'                   		#functionExp
+atomexpr          	: funcName '(' (')' | atomexpr (',' atomexpr)* ')')                   #functionExp
                     | NUMBER                                    							#numericAtomExp
                     | STRING																#stringAtomExp
                     | variable		                                       				#varAtomExp

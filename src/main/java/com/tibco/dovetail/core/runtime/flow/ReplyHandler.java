@@ -15,6 +15,13 @@ public class ReplyHandler {
 		}
 	}
 	
+	public void setReply(String status, Object o) {
+		if(!hasReplied) {
+			data = new ReplyData(status, o);
+			hasReplied = true;
+		} 
+	}
+	
 	public boolean hasReplied() {
 		return this.hasReplied;
 	}

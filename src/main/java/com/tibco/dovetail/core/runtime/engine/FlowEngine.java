@@ -25,7 +25,6 @@ import com.tibco.dovetail.core.runtime.flow.Node;
 import com.tibco.dovetail.core.runtime.flow.ReplyData;
 import com.tibco.dovetail.core.runtime.flow.ReplyHandler;
 import com.tibco.dovetail.core.runtime.flow.TransactionFlow;
-import com.tibco.dovetail.core.runtime.flow.Mapping.ValueMappingType;
 import com.tibco.dovetail.core.runtime.services.IContainerService;
 import com.tibco.dovetail.core.runtime.services.ILogService;
 import com.tibco.dovetail.core.runtime.util.JsonUtil;
@@ -47,6 +46,7 @@ public class FlowEngine {
         replyHandler = new ReplyHandler();
     }
     
+    @Suspendable
 	public ReplyData execute(Context context) {
         try {
             this.container = context.getContainerService();
@@ -72,6 +72,7 @@ public class FlowEngine {
         return this.replyHandler.getReplyData();
     }
 
+    @Suspendable
     private void runNode(Node n){
         //invoke model
         invokeTask(n.getTaskId());
@@ -83,16 +84,16 @@ public class FlowEngine {
         };
     }
 
+    @Suspendable
     private void invokeTask(String id){
     		logger.debug("Invoke activity " + id);
-        ActivityTask activity = flow.getTask(id);
-        if(activity == null)
-            return;
+        if(!checkActivityExist(id))
+        		return;
         
         Context context = null;
-        if(activity.isIteratorTask()) {
+        if(isIterateTask(id)) {
         		//get iterate object
-        		Object iterate = readValue(activity.getIterateField(), scope);
+        		Object iterate = getIterateValue(id);
         		if(iterate != null) {
         			JSONArray vals = ((DocumentContext)iterate).json();
         			DocumentContext output = JsonUtil.getJsonParser().parse("[]");
@@ -101,8 +102,8 @@ public class FlowEngine {
         				scope.addVariable("$current", "key", i);
         				scope.addVariable("$current", "value", vals.get(i));
         				
-        				context = resolveInputs(activity);	
-        				context = evalActivity(activity.getActivityRef(), context);
+        				context = resolveInputs(id);	
+        				context = evalActivity(getActivityRef(id), context);
         				
         				//TODO: should check accumulation flag from UI
         				if(context.getOutputs().size() > 0) {
@@ -136,14 +137,35 @@ public class FlowEngine {
         		}
         		
         }else {
-        		context = resolveInputs(activity);
-        		context = evalActivity(activity.getActivityRef(), context);
+        		context = resolveInputs(id);
+        		context = evalActivity(getActivityRef(id), context);
         		context.getOutputs().forEach((k, v) -> scope.addVariable("$activity", id + "." + k, v));
         }
 
     }
+    
+    private boolean checkActivityExist(String id) {
+    		ActivityTask activity = flow.getTask(id);
+        if(activity == null)
+             return false;
+        else
+        		return true;
+    }
 
-    private ContextImpl resolveInputs(ActivityTask activity){
+    private String getActivityRef(String id) {
+    		return flow.getTask(id).getActivityRef();
+    }
+    
+    private boolean isIterateTask(String id) {
+    		return flow.getTask(id).isIteratorTask();
+    }
+    
+    private Object getIterateValue(String id) {
+    		ActivityTask activity = flow.getTask(id);
+    		return readValue(activity.getIterateField(), scope);
+    }
+    private ContextImpl resolveInputs(String id){
+    		ActivityTask activity = flow.getTask(id);
 
         ContextImpl context = new ContextImpl();
         context.setContainerService(this.container);
@@ -154,6 +176,10 @@ public class FlowEngine {
             if(v.getMappingType() == null){
                 context.addInput(k, v.getMappingValue());
                 return;
+            }
+            
+            if(v.getComplextObjectMetadata() != null ) {
+            		context.addInput(k+"_metadata", v.getComplextObjectMetadata());
             }
 
             switch (v.getMappingType()){
@@ -287,7 +313,7 @@ public class FlowEngine {
 
         for(String k: mapping.keySet()){
             Object objmap = mapping.get(k).getMappingValue();
-            ValueMappingType mapType = mapping.get(k).getMappingType();
+            com.tibco.dovetail.core.runtime.flow.ValueMappingType mapType = mapping.get(k).getMappingType();
             
             switch(mapType) { 
             case literal:

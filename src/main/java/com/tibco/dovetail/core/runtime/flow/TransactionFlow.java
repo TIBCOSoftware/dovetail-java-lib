@@ -12,6 +12,8 @@ import com.tibco.dovetail.core.runtime.engine.FlowEngine;
 import com.tibco.dovetail.core.runtime.services.IContainerService;
 import com.tibco.dovetail.core.runtime.transaction.TxnACL;
 
+import co.paralleluniverse.fibers.Suspendable;
+
 public class TransactionFlow extends BasicTransactionFlow{
 
     private BasicTransactionFlow errorHandler;
@@ -25,6 +27,7 @@ public class TransactionFlow extends BasicTransactionFlow{
         this.errorHandler = handler;
     }
 
+    @Suspendable
     public ReplyData handle(IContainerService stub, Map<String, Object> triggerData) {
     		FlowEngine engine = new FlowEngine(this);
     		ContextImpl context = new ContextImpl();

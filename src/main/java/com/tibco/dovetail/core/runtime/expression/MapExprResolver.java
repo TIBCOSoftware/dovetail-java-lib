@@ -77,8 +77,9 @@ public class MapExprResolver extends MapExprGrammarBaseVisitor{
 
     @Override
     public Object visitFunctionExp(MapExprGrammarParser.FunctionExpContext ctx){
+    		String function = "";
         try {
-            String function = (String) visitFuncName(ctx.funcName());
+            function = (String) visitFuncName(ctx.funcName());
             String[] fn = function.split("\\.");
             
             if (fn.length != 2) {
@@ -115,7 +116,7 @@ public class MapExprResolver extends MapExprGrammarBaseVisitor{
 
             throw new RuntimeException("function " + function + " is not defined");
         }catch (Exception e){
-            throw new RuntimeException(e);
+            throw new RuntimeException("error while processing function " + function, e);
         }
     }
 
@@ -223,24 +224,28 @@ public class MapExprResolver extends MapExprGrammarBaseVisitor{
     }
 
     private Object readValue(Object v, String path){
-        DocumentContext doc = null;
-        if(v instanceof DocumentContext)
-        		doc = (DocumentContext) v;
-        else if(v instanceof LinkedHashMap)
-        		doc = JsonUtil.getJsonParser().parse((LinkedHashMap)v);
-        
-        if(doc.json() instanceof JSONArray)
-            path = "$.." + path;
-        else
-            path = "$." + path;
-        List<Object> list= doc.read(path);
-        Object value = null;
-        if(list.size() == 1)
-            value = list.get(0);
-        else
-            value = list;
-
-        return value;
+    		DocumentContext doc = null;
+    	    try {
+	        if(v instanceof DocumentContext)
+	        		doc = (DocumentContext) v;
+	        else if(v instanceof LinkedHashMap)
+	        		doc = JsonUtil.getJsonParser().parse((LinkedHashMap)v);
+	        
+	        if(doc.json() instanceof JSONArray)
+	            path = "$.." + path;
+	        else
+	            path = "$." + path;
+	        List<Object> list= doc.read(path);
+	        Object value = null;
+	        if(list.size() == 1)
+	            value = list.get(0);
+	        else
+	            value = list;
+	
+	        return value;
+    	    }catch (Exception e) {
+    	    		throw new RuntimeException("error while readValue of " + path + " from " + doc.jsonString(), e);
+    	    }
     }
 
     @Override
@@ -248,24 +253,28 @@ public class MapExprResolver extends MapExprGrammarBaseVisitor{
         List<TerminalNode> names = ctx.NAME();
 
         String var = names.get(0).getText().trim();
-        int element = -1;
-        
-        if(var.endsWith("]")) {
-        		int idx = var.indexOf("[");
-        		element = Integer.parseInt(var.substring(idx+1, var.length()-1));
-        		var = var.substring(0, idx);
+        try {
+	        int element = -1;
+	        
+	        if(var.endsWith("]")) {
+	        		int idx = var.indexOf("[");
+	        		element = Integer.parseInt(var.substring(idx+1, var.length()-1));
+	        		var = var.substring(0, idx);
+	        }
+	        Object value = scope.getVariable(Scope.SCOPE_FLOW, var);
+	        
+	        if(names.size() > 1){
+	            String path = names.subList(1, names.size()).stream().map(it-> it.getText()).collect(Collectors.joining("."));
+	            value = readValue(value, path);
+	        }
+	
+	        if(element >= 0 && value instanceof JSONArray)
+	        		return ((JSONArray)value).get(element);
+	        	else
+	        		return value;
+        }catch(Exception e) {
+        		throw new RuntimeException("error in visitFlow, var=" + var, e);
         }
-        Object value = scope.getVariable(Scope.SCOPE_FLOW, var);
-        
-        if(names.size() > 1){
-            String path = names.subList(1, names.size()).stream().map(it-> it.getText()).collect(Collectors.joining("."));
-            value = readValue(value, path);
-        }
-
-        if(element >= 0 && value instanceof JSONArray)
-        		return ((JSONArray)value).get(element);
-        	else
-        		return value;
     }
 
     @Override 

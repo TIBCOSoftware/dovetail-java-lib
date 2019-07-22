@@ -17,6 +17,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tibco.dovetail.core.runtime.flow.AttributeMapping;
+import com.tibco.dovetail.core.runtime.util.ModelUtil;
 
 public class TestUtil {
 
@@ -74,5 +75,11 @@ public class TestUtil {
 			e.printStackTrace();
 		} 
  		
+	}
+	
+	@Test
+	public void namespace() {
+		System.out.println("com.example.iou.IOU".lastIndexOf("."));
+		System.out.println(ModelUtil.getNameSpace("com.example.iou.IOU"));
 	}
 }

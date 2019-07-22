@@ -1,4 +1,4 @@
-// Generated from MapExprGrammar.g4 by ANTLR 4.7.1
+// Generated from MapExprGrammar.g4 by ANTLR 4.7.2
 package com.tibco.dovetail.core.runtime.expression;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.CharStream;
@@ -11,7 +11,7 @@ import org.antlr.v4.runtime.misc.*;
 
 @SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast"})
 public class MapExprGrammarLexer extends Lexer {
-	static { RuntimeMetaData.checkVersion("4.7.1", RuntimeMetaData.VERSION); }
+	static { RuntimeMetaData.checkVersion("4.7.2", RuntimeMetaData.VERSION); }
 
 	protected static final DFA[] _decisionToDFA;
 	protected static final PredictionContextCache _sharedContextCache =
@@ -29,24 +29,33 @@ public class MapExprGrammarLexer extends Lexer {
 		"DEFAULT_MODE"
 	};
 
-	public static final String[] ruleNames = {
-		"T__0", "T__1", "T__2", "T__3", "T__4", "T__5", "T__6", "T__7", "T__8", 
-		"T__9", "T__10", "T__11", "LETTER", "DIGIT", "AND", "OR", "EQUAL", "NOTEQUAL", 
-		"GT", "LT", "GE", "LE", "ASTERISK", "SLASH", "MOD", "PLUS", "MINUS", "NAME", 
-		"NUMBER", "STRING", "WHITESPACE"
-	};
+	private static String[] makeRuleNames() {
+		return new String[] {
+			"T__0", "T__1", "T__2", "T__3", "T__4", "T__5", "T__6", "T__7", "T__8", 
+			"T__9", "T__10", "T__11", "LETTER", "DIGIT", "AND", "OR", "EQUAL", "NOTEQUAL", 
+			"GT", "LT", "GE", "LE", "ASTERISK", "SLASH", "MOD", "PLUS", "MINUS", 
+			"NAME", "NUMBER", "STRING", "WHITESPACE"
+		};
+	}
+	public static final String[] ruleNames = makeRuleNames();
 
-	private static final String[] _LITERAL_NAMES = {
-		null, "'('", "')'", "','", "'.'", "'{{'", "'$activity['", "'].'", "'}}'", 
-		"'$flow.'", "'$current.iteration.key'", "'$current.iteration.value.'", 
-		"'$.'", null, null, "'=='", null, "'>'", "'<'", "'>='", "'<='", "'*'", 
-		"'/'", "'%'", "'+'", "'-'"
-	};
-	private static final String[] _SYMBOLIC_NAMES = {
-		null, null, null, null, null, null, null, null, null, null, null, null, 
-		null, "AND", "OR", "EQUAL", "NOTEQUAL", "GT", "LT", "GE", "LE", "ASTERISK", 
-		"SLASH", "MOD", "PLUS", "MINUS", "NAME", "NUMBER", "STRING", "WHITESPACE"
-	};
+	private static String[] makeLiteralNames() {
+		return new String[] {
+			null, "'('", "')'", "','", "'.'", "'{{'", "'$activity['", "'].'", "'}}'", 
+			"'$flow.'", "'$current.iteration.key'", "'$current.iteration.value.'", 
+			"'$.'", null, null, "'=='", null, "'>'", "'<'", "'>='", "'<='", "'*'", 
+			"'/'", "'%'", "'+'", "'-'"
+		};
+	}
+	private static final String[] _LITERAL_NAMES = makeLiteralNames();
+	private static String[] makeSymbolicNames() {
+		return new String[] {
+			null, null, null, null, null, null, null, null, null, null, null, null, 
+			null, "AND", "OR", "EQUAL", "NOTEQUAL", "GT", "LT", "GE", "LE", "ASTERISK", 
+			"SLASH", "MOD", "PLUS", "MINUS", "NAME", "NUMBER", "STRING", "WHITESPACE"
+		};
+	}
+	private static final String[] _SYMBOLIC_NAMES = makeSymbolicNames();
 	public static final Vocabulary VOCABULARY = new VocabularyImpl(_LITERAL_NAMES, _SYMBOLIC_NAMES);
 
 	/**

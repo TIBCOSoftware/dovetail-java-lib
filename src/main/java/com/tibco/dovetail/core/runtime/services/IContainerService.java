@@ -9,4 +9,6 @@ public interface IContainerService {
     public IDataService getDataService();
     public IEventService getEventService();
     public ILogService getLogService();
+    public void addContainerProperty(String name, Object v);
+    public Object getContainerProperty(String name);
 }
