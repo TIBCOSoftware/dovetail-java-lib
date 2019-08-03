@@ -9,7 +9,6 @@ import com.jayway.jsonpath.DocumentContext;
 import com.tibco.dovetail.core.runtime.engine.Scope;
 import com.tibco.dovetail.core.runtime.util.CompareUtil;
 import com.tibco.dovetail.core.runtime.util.JsonUtil;
-import com.tibco.dovetail.function.string;
 
 import net.minidev.json.JSONArray;
 import org.antlr.v4.runtime.tree.TerminalNode;
@@ -17,7 +16,6 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -267,7 +265,7 @@ public class MapExprResolver extends MapExprGrammarBaseVisitor{
 	            String path = names.subList(1, names.size()).stream().map(it-> it.getText()).collect(Collectors.joining("."));
 	            value = readValue(value, path);
 	        }
-	
+	 
 	        if(element >= 0 && value instanceof JSONArray)
 	        		return ((JSONArray)value).get(element);
 	        	else
@@ -280,20 +278,31 @@ public class MapExprResolver extends MapExprGrammarBaseVisitor{
     @Override 
     public Object visitCurrent(MapExprGrammarParser.CurrentContext ctx) { 
     	  	List<TerminalNode> names = ctx.NAME();
-    	  	String path = names.stream().map(n -> n.getText()).collect(Collectors.joining("."));
-    	  	Object from = scope.getVariable(Scope.SCOPE_LOCAL, "from");
-    	  	if(from != null)
-    	  		return readValue(from, path);
-    	  	else
-    	  		return null;
+    	  	String path = null; 
+    	  	Object from  = null;
+    	  	
+    	  	if(scope.isRootScope()) {
+    	  		from = scope.getVariable(Scope.SCOPE_CURRENT, names.get(0).getText());
+    	  		path = names.subList(1, names.size()).stream().map(n -> n.getText()).collect(Collectors.joining("."));
+    	  	}
+    	  	else {
+    	  		from = scope.getVariable(Scope.SCOPE_CURRENT, "from");
+    	  		path = names.stream().map(n -> n.getText()).collect(Collectors.joining("."));
+    	  	}
+    	  	
+    	  	if(from == null || path == null || path.isEmpty()) 
+    	  		return from;
+    	  
+    	  	return readValue(from, path);
+    	  	
     	}
     
     @Override public Integer visitIteratorKey(MapExprGrammarParser.IteratorKeyContext ctx) { 
-    		return (int) scope.getVariable("$current", "key"); 
+    		return (int) scope.getVariable("$iteration", "key"); 
     	}
 	
 	@Override public Object visitIteratorValue(MapExprGrammarParser.IteratorValueContext ctx) { 
-		Object value = scope.getVariable("$current", "value");
+		Object value = scope.getVariable("$iteration", "value");
 		if (value != null ) {
 			List<TerminalNode> names = ctx.NAME();
     	  		String path = names.stream().map(n -> n.getText()).collect(Collectors.joining("."));
@@ -301,7 +310,12 @@ public class MapExprResolver extends MapExprGrammarBaseVisitor{
 		} else 
 			return null;
 	}
-
+	
+	@Override public Object visitProperty(MapExprGrammarParser.PropertyContext ctx) {
+		String p = ctx.NAME().stream().map(it -> it.getText()).collect(Collectors.joining("."));
+		return scope.getVariable(Scope.SCOPE_PROPERTY, p); 
+	}
+	
 }
 
 

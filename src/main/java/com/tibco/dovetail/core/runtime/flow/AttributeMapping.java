@@ -5,6 +5,8 @@
  */
 package com.tibco.dovetail.core.runtime.flow;
 
+import org.antlr.v4.runtime.tree.ParseTree;
+
 import com.tibco.dovetail.core.model.composer.HLCResource;
 
 public class AttributeMapping{
@@ -12,18 +14,33 @@ public class AttributeMapping{
 	/*****************************
 	 * mappingValue can be following types:
 	 * expression mapping - ParseTree, 
-	 * attribute is an object - map<String, AttributeMapping>
-	 * attribute is an array - map<String, Object>, keys are "from", "to", "type", and "fields"
+	 * attribute is an object/array - List<AttributeMapping>
 	 * otherwise, literal or assignment - Object
 	 */
 
-    private String name;
-    private HLCResource metadata = null;
+    private String name; 
+    private String dataType;
+	private HLCResource metadata = null;
 	private Object mappingValue;
     private ValueMappingType mappingType;
+    private ParseTree from;
 
+    public String getDataType() {
+		return dataType;
+	}
 
-    public AttributeMapping(String name){
+	public void setDataType(String dataType) {
+		this.dataType = dataType;
+	}
+	public ParseTree getFrom() {
+		return from;
+	}
+
+	public void setFrom(ParseTree from) {
+		this.from = from;
+	}
+
+	public AttributeMapping(String name){
         this.name = name;
     }
 

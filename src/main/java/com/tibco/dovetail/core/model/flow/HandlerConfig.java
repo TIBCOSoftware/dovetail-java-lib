@@ -10,32 +10,31 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class HandlerConfig {
-	private Map<String, Object> settings;
-	private Output outputs;  
+	private Map<String, Object> settings; 
 	private Action action;
+	private Map<String, Object> schemas;
 	private Resources flowResource;
 	private String flowId;
 	private String flowName;
 	
 	 public String getFlowURI() {
-		 if(this.action != null && this.action.data != null) {
-			 return this.getAction().getData().get("flowURI");
+		 if(this.action != null && this.action.getSettings() != null) {
+			 return this.getAction().getSettings().get("flowURI");
 		 } else {
 			 return null;
 		 }
 		
 	 }
 	 
-	 public String getTransactionInputSchema() {
-		 if(this.outputs != null && this.outputs.transactionInput != null) {
-			 return this.outputs.transactionInput.metadata;
-		 } else {
-			 return null;
-		 }
-		
-	 }
-	 
-	 public Object getSetting(String name) {
+	 public Map<String, Object> getInput() {
+		return this.action.getInput();
+	}
+
+	public Map<String, Object> getOutput() {
+		return this.action.getOutput();
+	}
+
+	public Object getSetting(String name) {
 		 if(this.settings != null ) {
 			 return this.settings.get(name);
 		 } else {
@@ -70,14 +69,6 @@ public class HandlerConfig {
 		this.settings = settings;
 	}
 
-	public Output getOutputs() {
-		return outputs;
-	}
-
-	public void setOutputs(Output outputs) {
-		this.outputs = outputs;
-	}
-
 	public Action getAction() {
 		return action;
 	}
@@ -85,32 +76,20 @@ public class HandlerConfig {
 	public void setAction(Action action) {
 		this.action = action;
 	}
-	 
-	 @JsonIgnoreProperties(ignoreUnknown = true)
-	 public static class Output {
-		 public TransactionInput getTransactionInput() {
-			return transactionInput;
-		}
+	
+	public Map<String, Object> getSchemas() {
+		return schemas;
+	}
 
-		public void setTransactionInput(TransactionInput transactionInput) {
-			this.transactionInput = transactionInput;
-		}
-
-		private TransactionInput transactionInput;
-	 }
-	 
-	 @JsonIgnoreProperties(ignoreUnknown = true)
-	 public static class TransactionInput {
-		 public String getMetadata() {
-			return metadata;
-		}
-
-		public void setMetadata(String metadata) {
-			this.metadata = metadata;
-		}
-
-		private String metadata;
-	 }
+	public void setSchemas(Map<String, Object> schemas) {
+		this.schemas = schemas;
+	}
+	
+	public String getTransactionInputMetadata() {
+		Map<String, Object> txnout = (Map<String, Object>) this.schemas.get("output");
+		Map<String, Object> txnIn = (Map<String, Object>) txnout.get("transactionInput");
+		return txnIn.get("value").toString();
+	}
 	 
 	 @JsonIgnoreProperties(ignoreUnknown = true)
 	 public static class Action {
@@ -120,14 +99,29 @@ public class HandlerConfig {
 		public void setRef(String ref) {
 			this.ref = ref;
 		}
-		public Map<String, String> getData() {
-			return data;
+		public Map<String, String> getSettings() {
+			return settings;
 		}
-		public void setData(Map<String, String> data) {
-			this.data = data;
+		public void setSettings(Map<String, String> data) {
+			this.settings = data;
 		}
+		public Map<String, Object> getInput() {
+			return input;
+		}
+		public void setInput(Map<String, Object> input) {
+			this.input = input;
+		}
+		public Map<String, Object> getOutput() {
+			return output;
+		}
+		public void setOutput(Map<String, Object> putput) {
+			this.output = putput;
+		}
+		
+		private Map<String, Object> output;
 		private String ref;
-		 private Map<String, String> data;
+		private Map<String, String> settings;
+		private Map<String, Object> input;
 	 }
 	 
 }

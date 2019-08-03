@@ -129,4 +129,10 @@ public interface MapExprGrammarVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitCurrent(MapExprGrammarParser.CurrentContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link MapExprGrammarParser#property}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitProperty(MapExprGrammarParser.PropertyContext ctx);
 }

@@ -24,16 +24,16 @@ variable				: activity
 				    | iteratorKey
 				    | iteratorValue
 				    | current
+				    | property
 //				    | containerService
 					;
 					
 activity				: ('{{')? '$activity[' NAME '].' NAME ('.' NAME)* ('}}')?;
-//flow					: ('{{')? '$flow.transactionInput.' NAME ('.' NAME)* ('}}')?;
 flow					: ('{{')? '$flow.' NAME ('.' NAME)* ('}}')?;
-iteratorKey			: '$current.iteration.key';
-iteratorValue	    : '$current.iteration.value.' NAME ('.' NAME)*;
+iteratorKey			: '$iteration.key';
+iteratorValue	    : '$iteration[value]'('.' NAME)*;
 current				: '$.' NAME ('.' NAME)*;
-//containerService		: '$flow.containerServiceStub';
+property				: '$property["' NAME ('.' NAME)* '"]';
  
 fragment LETTER     : [a-zA-Z_] ;
 fragment DIGIT      : [0-9] ;

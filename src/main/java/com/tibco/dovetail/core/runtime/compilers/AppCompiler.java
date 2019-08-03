@@ -11,24 +11,33 @@ import com.tibco.dovetail.core.runtime.util.ModelUtil;
 
 public class AppCompiler {
 
-	 public static LinkedHashMap<String, ITrigger> compileApp(InputStream txJson)  {
+	 public static App compileApp(InputStream txJson)  {
+		 App app = new App();
 		 LinkedHashMap<String, ITrigger> triggers = new LinkedHashMap<String, ITrigger>();
+		 
 		try {
-			FlowAppConfig app = FlowAppConfig.parseModel(txJson);
-		    TriggerConfig[] triggerConfigs = app.getTriggers();
+			FlowAppConfig appconfig = FlowAppConfig.parseModel(txJson);
+			app.addImports(appconfig.getImports());
+			app.addProperties(appconfig.getProperties());
+			
+		    TriggerConfig[] triggerConfigs = appconfig.getTriggers();
 		    if(triggerConfigs == null || triggerConfigs.length == 0)
 		    		throw new RuntimeException("There is no trigger defined in the application");
 		   
 		    for (int i=0; i<triggerConfigs.length; i++) {
 				String ref = triggerConfigs[i].getRef();
 		        	String clazz = ModelUtil.getRefClassName(ref);
-		        ITrigger	trigger = TriggerFactory.createTrigger(clazz); 
-		        	triggers.putAll(trigger.Initialize(triggerConfigs[i]));
+		        ITrigger	trigger = TriggerFactory.createTrigger(clazz);
+		        	triggers.putAll(trigger.Initialize(triggerConfigs[i], app.getProperties()));
 		    }
 	        	
-		    return triggers;
+		    app.addTriggers(triggers);
+		   
+		    return app;
 		}catch(Exception e) {
             throw new RuntimeException(e);
         }
     	}
+	 
+	
 }

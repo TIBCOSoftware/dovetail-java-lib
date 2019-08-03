@@ -85,7 +85,8 @@ public class Link {
                 case 3:
                     return error;
 
-                    default:return normal;
+                default:
+                		return normal;
 
             }
         }
