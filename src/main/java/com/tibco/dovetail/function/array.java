@@ -17,7 +17,6 @@ public class array {
 	}
 	
 	public static List<Object> create(Object... args) {
-		System.out.println("'" + args[0] + "'");
 		return Arrays.asList(args);
 	}
 	
