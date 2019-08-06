@@ -9,7 +9,6 @@ import com.jayway.jsonpath.DocumentContext;
 import com.tibco.dovetail.core.runtime.engine.Scope;
 import com.tibco.dovetail.core.runtime.util.CompareUtil;
 import com.tibco.dovetail.core.runtime.util.JsonUtil;
-import com.tibco.dovetail.function.string;
 
 import net.minidev.json.JSONArray;
 import org.antlr.v4.runtime.tree.TerminalNode;
@@ -318,5 +317,3 @@ public class MapExprResolver extends MapExprGrammarBaseVisitor{
 	}
 	
 }
-
-
