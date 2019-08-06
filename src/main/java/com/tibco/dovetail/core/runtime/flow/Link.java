@@ -18,7 +18,7 @@ import java.nio.charset.StandardCharsets;
 public class Link {
 
     private String condition;
-    private ParseTree conditionObject;
+    transient private ParseTree conditionObject;
 
     private LinkMapType type;
     private Node nextNode;

@@ -21,9 +21,9 @@ public class AttributeMapping{
     private String name; 
     private String dataType;
 	private HLCResource metadata = null;
-	private Object mappingValue;
+	transient private Object mappingValue;
     private ValueMappingType mappingType;
-    private ParseTree from;
+    transient private ParseTree from;
 
     public String getDataType() {
 		return dataType;
