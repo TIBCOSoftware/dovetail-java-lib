@@ -12,6 +12,7 @@ deploy:
   api_key: "$GITHUB_TOKEN"
   skip_cleanup: true
   prerelease: $PRERELEASE
+  name: $TRAVIS_TAG
   body: "$RELEASE_NOTES"
   on:
     branch:
