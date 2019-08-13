@@ -1,9 +1,4 @@
 language: java
-branches:
-  only:
-  - master
-  - develop
-  - issue-23/cicd
 before_deploy:
     - git config --local user.name "torresashjian"
     - git config --local user.email "migueltorreslopez@gmail.com"
@@ -22,4 +17,3 @@ deploy:
     branch:
     - master
     - develop
-    - issue-23/cicd
