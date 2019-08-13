@@ -2,7 +2,11 @@
 title: dovetail-java-lib
 weight: 4603
 ---
+
+[![Documentation Status](https://travis-ci.org/TIBCOSoftware/dovetail-java-lib.svg?branch=master)](https://travis-ci.org/TIBCOSoftware/dovetail-java-lib)<img src="https://img.shields.io/badge/license-BSD%20style-blue.svg"/>
+
 # dovetail-java-lib
+
 
 Project Dovetail™ Java library provides a runtime environment to interpret and execute smart contract flows developed using Project Dovetail™ Studio. It provides hooks to plugin any blockchain or distributed ledger platforms through a set of interfaces that must be implemented.
 
