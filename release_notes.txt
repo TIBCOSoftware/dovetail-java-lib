@@ -1,0 +1,2 @@
+Release notes: 
+    - Refactor to support flogo v0.9.2 runtime.
