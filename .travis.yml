@@ -2,7 +2,6 @@ branches:
   only:
   - master
   - develop
-  - issue-23/cicd
 script:
 - echo "Starting build..."
 before_deploy:
@@ -23,4 +22,3 @@ deploy:
     branch:
     - master
     - develop
-    - issue-23/cicd
