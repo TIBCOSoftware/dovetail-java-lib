@@ -11,3 +11,7 @@ is-prerelease:
 .PHONY: release-notes
 release-notes: 
 	@ $(SCRIPTS_PATH)/release-notes.sh
+
+.PHONY: artifacts
+artifacts: 
+	@ $(SCRIPTS_PATH)/artifacts.sh ${BUILD_TAG}
