@@ -5,40 +5,36 @@
  */
 package com.tibco.dovetail.core.runtime.compilers;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tibco.dovetail.core.model.activity.ActivityModel;
 import com.tibco.dovetail.core.model.common.SimpleAttribute;
+import com.tibco.dovetail.core.model.composer.MetadataParser;
 import com.tibco.dovetail.core.model.flow.*;
-import com.tibco.dovetail.core.runtime.engine.Scope;
-import com.tibco.dovetail.core.runtime.expression.MapExprGrammarLexer;
-import com.tibco.dovetail.core.runtime.expression.MapExprGrammarParser;
+import com.tibco.dovetail.core.model.flow.ActivityConfig.Schemas;
 import com.tibco.dovetail.core.runtime.flow.*;
-import com.tibco.dovetail.core.runtime.flow.Mapping.ValueMappingType;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.tree.ParseTree;
 
 public class FlowCompiler {
-	final static Pattern MAP_TO_ATTR_PATTERN = Pattern.compile("(\\$INPUT.\\$.\\$)?(\\['(?<name>\\w+)'\\])+?");
-	final static Pattern FUNCTION = Pattern.compile("[a-zA-Z]+\\.[a-zA-Z].*?\\(.*?\\)");
+//	final static Pattern MAP_TO_ATTR_PATTERN = Pattern.compile("(\\$INPUT.\\$.\\$)?(\\['(?<name>\\w+)'\\])+?");
+//	final static Pattern FUNCTION = Pattern.compile("[a-zA-Z]+\\.[a-zA-Z].*?\\(.*?\\)");
 	
-    public static TransactionFlow compile( Resources r) throws Exception {
+    public static TransactionFlow compile( HandlerConfig cfg) throws Exception {
+    		Resources r = cfg.getFlow();
     		ObjectMapper mapper = new ObjectMapper();
     		TransactionFlow flow = new TransactionFlow();
     		compileFlow(mapper, flow, r.getData());
+    		compileTriggerToFlowMapping(flow, cfg.getInput(), r.getData().getMetadata().getInput());
+    		compileFlowToTriggerMapping(flow, cfg.getOutput(), r.getData().getMetadata().getOutput());
+    		
+    		
+    		if(r.getData().getMetadata() != null) {
+               flow.setFlowOutputs(r.getData().getMetadata().getOutput());
+               flow.setFlowInputs(r.getData().getMetadata().getInput());
+        }
+    		
     		
 		 //error handler
         //TODO: error handler input (activity, data, message)
@@ -51,6 +47,25 @@ public class FlowCompiler {
         
         return flow;
     }
+    
+    private static void compileTriggerToFlowMapping(TransactionFlow flow, Map<String, Object> maps, List<SimpleAttribute> flowattrs) {
+    		for(SimpleAttribute attr : flowattrs) {
+    			Object value = maps.get(attr.getName());
+    			if(value != null) {
+    				flow.addTxnToFlowMapping(mapInputs(attr, value));
+    			}
+    		}
+    }
+    
+    private static void compileFlowToTriggerMapping(TransactionFlow flow, Map<String, Object> maps, List<SimpleAttribute> flowattrs) {
+		for(SimpleAttribute attr : flowattrs) {
+			Object value = maps.get(attr.getName());
+			if(value != null) {
+				flow.addFlowToTxnMapping(mapInputs(attr, value));
+			}
+		}
+}
+    
     private static void compileFlow(ObjectMapper mapper, BasicTransactionFlow flow, BasicFlow data) throws Exception{
         //tasks
         for(TasksConfig task : data.getTasks()){
@@ -59,10 +74,7 @@ public class FlowCompiler {
 
         //links
         Node root = compileLinks(data.getLinks());
-        if (data.getTasks().length == 0) {
-        		throw new RuntimeException("There is no activity in the flow");
-        }
-        
+    
         if(root == null && data.getTasks().length > 0) {
         		root = new Node(data.getTasks()[0].getId());
         }
@@ -75,7 +87,7 @@ public class FlowCompiler {
        
         if(task.getType() != null && task.getType().equals("iterator")) {
         		activityTask.setIteratorTask(true);
-        		activityTask.setIterateField(parseExpression(task.getSetting("iterate")));
+        		activityTask.setIterateField(CompilerHelper.parseExpression(task.getSetting("iterate")));
         }
         
         activityTask.setActivityRef(task.getActivity().getRef());
@@ -85,85 +97,55 @@ public class FlowCompiler {
         Map<String, Object> input = task.getActivity().getInput();
         if(input != null) {
             for (String attr : input.keySet()){
-                SimpleAttribute a = getActivityInputAttribute(activityModel, attr);    		
-                InputMapping inputMapping = new InputMapping();      
-                inputMapping.setMappingType(Mapping.ValueMappingType.literal);
+                SimpleAttribute a = getActivityInputAttribute(activityModel, attr);
+                AttributeMapping inputMapping = null;
                 
-                inputMapping.setMappingValue(task.getActivity().getInput().get(attr));
-                activityTask.addInput(a.getName(), inputMapping);
-            }
-        }
-
-        //map input mappings, it could overrides map input values
-        TaskMappings mappings = task.getActivity().getMappings();
-        if(mappings != null && mappings.getInput() != null) {
-            for (TaskMapping mapping : mappings.getInput()){
-            		ArrayList<String> names = getInputAttrName(MAP_TO_ATTR_PATTERN, mapping.getMapTo());
-                 Object mappingValue = mapping.getValue();
-                 ValueMappingType mappingType = AttributeMapping.ValueMappingType.valueOf(mapping.getType());
-                 SimpleAttribute a = getActivityInputAttribute(activityModel, names.get(0));
-                 
-            		//find top level attribute object mapping
-                Mapping root = activityTask.getInput(names.get(0));
-                if (root == null) {
-                    root = new InputMapping();
-                    
-                    activityTask.addInput(names.get(0), root);
-                }
-
-                //first time
-                if(root.getMappingType() != Mapping.ValueMappingType.object && names.size() > 1) {
-            			root.setMappingType(Mapping.ValueMappingType.object);
-            			root.setMappingValue(new LinkedHashMap<String, AttributeMapping>());
-                }
-                
-                Mapping map = root;
-                if(names.size() > 1) {
-                		String attr = names.subList(1,names.size()).stream().collect(java.util.stream.Collectors.joining("."));
-                		map = ((Map<String, AttributeMapping>)root.getMappingValue()).get(attr);
-                		if (map == null) {
-                			map = new AttributeMapping(attr);
-                			((Map<String, AttributeMapping>)root.getMappingValue()).put(attr, (AttributeMapping) map);
+                Object mappingValue = input.get(a.getName());
+                if(mappingValue != null) {  
+                		inputMapping = mapInputs(a, mappingValue);
+                		Schemas schemas = task.getActivity().getSchemas();
+                		if(schemas != null) {
+                			String meta = schemas.getInputSchema(a.getName());
+                    		if(meta != null && !meta.trim().isEmpty()) {
+                    			a.setMetaSchema(meta);
+                    			inputMapping.setComplextObjectMetadata(MetadataParser.parseSingleSchema(meta.toString()));
+                    		}
                 		}
+                		
+                		activityTask.addInput(a.getName(), inputMapping);
                 }
-                
-                switch(mappingType) {
-                		case literal:
-                			map.setMappingType(AttributeMapping.ValueMappingType.literal);
-		        			map.setMappingValue(mappingValue);
-		        			break;
-		    	        case array:
-		    	            Map<String, Object> arraymap = mapper.readValue(mappingValue.toString(), new TypeReference<Map<String, Object>>(){} ); 
-		    	        		map.setMappingType(AttributeMapping.ValueMappingType.array);
-		    	        		map.setMappingValue(parseArrayMapping(arraymap));
-		    	            break;
-		    	        case assign:
-		    	        case expression:
-		    	        	 	if(a.getType().equals("any")) {
-		    	        	 		map.setMappingType(AttributeMapping.ValueMappingType.assign);
-		    	        	 		map.setMappingValue(mappingValue);
-		    	        	 	}
-		    		        else {
-		    		        		String mapexpr = mappingValue.toString();
-		    		        		if(Scope.isScopeVariable(mapexpr) || isFunctionMapping(mapexpr)) {
-		    		        			map.setMappingType(AttributeMapping.ValueMappingType.expression);
-		    		        			map.setMappingValue(parseExpression(mappingValue.toString()));
-		    		        		} else {
-		    		        			map.setMappingType(AttributeMapping.ValueMappingType.literal);
-		    		        			map.setMappingValue(mappingValue);
-		    		        		}
-		    		        }
-		    		        	break;
-		    	        	
-		    		    default:
-		    		    		throw new IllegalArgumentException("Unsupported mapping type " + mappingType);
-		        }
-               
             }
         }
 
         return activityTask;
     }
+    
+    private static AttributeMapping mapInputs(SimpleAttribute a, Object mappingValue) {
+    	 	AttributeMapping inputMapping = null;
+	    	switch(a.getType()) {
+			case "complex_object":
+			case "object":
+		    		if(mappingValue instanceof Map) {
+		    			Map<String, Object> values = (Map<String, Object>)mappingValue;
+		    			inputMapping = CompilerHelper.parseObjectAttrs(a.getName(), values);
+		    		} else {
+		    			inputMapping = CompilerHelper.setDirectMapping(a.getName(), mappingValue);
+		    		}
+				break;
+			case "any":
+				inputMapping = new AttributeMapping(a.getName());
+				inputMapping.setMappingType(ValueMappingType.assign);
+				if(CompilerHelper.isExpression(mappingValue.toString()))
+					inputMapping.setMappingValue(mappingValue.toString().substring(1));
+				else
+					inputMapping.setMappingValue(mappingValue);
+				break;
+			default:
+				inputMapping = CompilerHelper.setDirectMapping(a.getName(), mappingValue);
+		}
+	    	return inputMapping;
+    }
+    
     private static Node compileLinks(LinksConfig[] links){
         Node root = null;
         Map<String, Node> nodes = new LinkedHashMap<String, Node>();
@@ -210,67 +192,7 @@ public class FlowCompiler {
         return a;
     }
     
-    private static ParseTree parseExpression(String mapping) {
-		InputStream stream = null;
-
-	    try {
-	        stream = new ByteArrayInputStream(mapping.getBytes(StandardCharsets.UTF_8));
-	        MapExprGrammarLexer lexer = new MapExprGrammarLexer(CharStreams.fromStream(stream, StandardCharsets.UTF_8));
-	        CommonTokenStream tokens = new CommonTokenStream(lexer);
-	        MapExprGrammarParser parser = new MapExprGrammarParser(tokens);
-	      
-	        ParseTree tree = parser.expression();
-	       
-	        return tree;
-	    }catch (Exception e){
-	        throw new RuntimeException("parseExpression error: " + mapping, e);
-	    } finally {
-	    		if(stream != null) {
-				try {
-					stream.close();
-				} catch (IOException e) {}
-	    		}
-	    }
-	}
-    
-    @SuppressWarnings("unchecked")
-	private static Map<String, Object> parseArrayMapping(Map<String, Object> map) throws Exception {
-    		String from = map.get("from").toString();
-    		if(from.equals("NEWARRAY") == false && (Scope.isScopeVariable(from) || isFunctionMapping(from))) {
-    			map.put("from", parseExpression(from));
-    		} 
-    		
-    		ArrayList<String> names = getInputAttrName(MAP_TO_ATTR_PATTERN, map.get("to").toString());
-    		map.put("to", names.stream().collect(java.util.stream.Collectors.joining(".")));
-		Object fields = map.get("fields");
-		if(fields != null && fields instanceof List) {
-			List<Object> lstfield = (List<Object>)fields;
-			for(Object v: lstfield){
-				Map<String, Object> fieldmap = (Map<String, Object>)v;
-				if(fieldmap.get("type").toString().equals("primitive")) {
-					//primitive
-					ArrayList<String> pnames = getInputAttrName(MAP_TO_ATTR_PATTERN, fieldmap.get("to").toString());
-		    			fieldmap.put("to", pnames.stream().collect(java.util.stream.Collectors.joining(".")));
-		    			String fromexp = fieldmap.get("from").toString();
-		    			if(Scope.isScopeVariable(fromexp) || isFunctionMapping(fromexp))
-		    				fieldmap.put("from", parseExpression(fromexp));
-		    			else
-		    				fieldmap.put("from", fieldmap.get("from"));
-				} else {
-					try {
-						parseArrayMapping(fieldmap);
-					} catch (Exception e) {
-						throw e;
-					}
-				}
-			}	
-		}
-    		
-    		return map;
-    } 
-    
-    
-    private static ArrayList<String> getInputAttrName(Pattern pattern, String mapTo) throws Exception {
+   /* private static ArrayList<String> getInputAttrName(Pattern pattern, String mapTo) throws Exception {
     		ArrayList<String> names = new ArrayList<String>();
     		Matcher matcher = pattern.matcher(mapTo);
 		while(matcher.find()) {
@@ -287,5 +209,6 @@ public class FlowCompiler {
     		Matcher matcher = FUNCTION.matcher(mapping);
     		return matcher.matches();
     }
-
+    */
+    
 }

@@ -12,8 +12,15 @@ public class SimpleAttribute {
     protected String name;
     protected String type;
     protected Object value = null;
+    protected String metadataSchema = null;
 
-    public void setName(String name) {
+    public String getMetadataSchema() {
+		return metadataSchema;
+	}
+	public void setMetaSchema(String schema) {
+		this.metadataSchema = schema;
+	}
+	public void setName(String name) {
         this.name = name;
     }
     public void setType(String type) {

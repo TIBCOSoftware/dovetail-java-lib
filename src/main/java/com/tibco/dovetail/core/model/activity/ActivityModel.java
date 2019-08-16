@@ -13,15 +13,15 @@ import com.tibco.dovetail.core.runtime.util.ModelUtil;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ActivityModel {
     private String ref;
-    private Map<String, SimpleAttribute> inputs = new HashMap<String, SimpleAttribute>();
-    private Map<String, SimpleAttribute> outputs = new HashMap<String, SimpleAttribute>();
+    private Map<String, SimpleAttribute> inputs = new LinkedHashMap<String, SimpleAttribute>();
+    private Map<String, SimpleAttribute> outputs = new LinkedHashMap<String, SimpleAttribute>();
 
     public String getRef() {
         return ref;
