@@ -9,7 +9,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class LinksConfig {
-    private String to;
+	private int id;
+	private String to;
     private String from;
     private String type;
     private String value;
@@ -44,4 +45,13 @@ public class LinksConfig {
     public void setValue(String v) {
         this.value = v;
     }
+    
+    public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
 }

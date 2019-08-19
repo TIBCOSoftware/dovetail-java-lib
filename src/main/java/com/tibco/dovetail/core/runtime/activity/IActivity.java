@@ -7,6 +7,9 @@ package com.tibco.dovetail.core.runtime.activity;
 
 import com.tibco.dovetail.core.runtime.engine.Context;
 
+import co.paralleluniverse.fibers.Suspendable;
+
 public interface IActivity {
+	@Suspendable
     public void eval(Context context) throws IllegalArgumentException;
 }

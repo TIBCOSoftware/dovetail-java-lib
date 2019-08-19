@@ -1,4 +1,4 @@
-// Generated from MapExprGrammar.g4 by ANTLR 4.7.1
+// Generated from MapExprGrammar.g4 by ANTLR 4.7.2
 package com.tibco.dovetail.core.runtime.expression;
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 
@@ -130,9 +130,9 @@ public interface MapExprGrammarVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitCurrent(MapExprGrammarParser.CurrentContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link MapExprGrammarParser#containerService}.
+	 * Visit a parse tree produced by {@link MapExprGrammarParser#property}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitContainerService(MapExprGrammarParser.ContainerServiceContext ctx);
+	T visitProperty(MapExprGrammarParser.PropertyContext ctx);
 }

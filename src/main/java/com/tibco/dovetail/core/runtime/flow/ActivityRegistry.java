@@ -7,11 +7,11 @@ package com.tibco.dovetail.core.runtime.flow;
 
 import com.tibco.dovetail.core.runtime.activity.IActivity;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class ActivityRegistry {
-    private static Map<String, IActivity> registry = new HashMap<String, IActivity>();
+    private static Map<String, IActivity> registry = new LinkedHashMap<String, IActivity>();
 
     public static synchronized void registerActivity(String ref, String clazz ) throws Exception{
         if(registry.get(ref) == null)

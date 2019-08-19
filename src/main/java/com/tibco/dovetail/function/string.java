@@ -9,12 +9,20 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
+import com.jayway.jsonpath.DocumentContext;
+
 public class string {
     public static String concat(Object ...arg){
         return Arrays.asList(arg).stream().map(o -> o.toString()).collect(Collectors.joining());
     }
    
     public static String tostring(Object arg){
+    		if (arg == null)
+    			return null;
+    		
+    		if(arg instanceof DocumentContext)
+    			return ((DocumentContext)arg).jsonString();
+    		
         return arg.toString();
     }
     

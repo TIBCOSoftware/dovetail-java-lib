@@ -6,20 +6,24 @@
 package com.tibco.dovetail.core.runtime.flow;
 
 public class ReplyHandler {
-	ReplyData data = null;
+	ReplyData reply = null;
     boolean hasReplied = false;
-	public void setReply(String status, String message, String payload) {
+	public void setReply(String data) {
 		if(!hasReplied) {
-			data = new ReplyData(status, message, payload);
+			reply = new ReplyData(data);
 			hasReplied = true;
+		} else {
+			throw new RuntimeException("Flow has been previously replied with " + this.reply.getData() + ", new reply is " + data);
 		}
 	}
+	
+	
 	
 	public boolean hasReplied() {
 		return this.hasReplied;
 	}
 	
 	public ReplyData getReplyData() {
-		return this.data;
+		return this.reply;
 	}
 }

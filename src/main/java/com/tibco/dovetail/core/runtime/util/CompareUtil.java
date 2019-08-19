@@ -23,7 +23,6 @@ public class CompareUtil implements Comparator{
 
     public static boolean compare(Object v1, Object v2, String op) {
     	if (op.equalsIgnoreCase("in")) {
-			boolean same = false;
 			Object[] values = (Object[])v2;
 			for(int i=0; i<values.length; i++) {
 				if(compare(v1, values[i], "==")){

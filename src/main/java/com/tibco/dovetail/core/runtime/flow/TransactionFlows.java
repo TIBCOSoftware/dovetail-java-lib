@@ -6,11 +6,11 @@
 package com.tibco.dovetail.core.runtime.flow;
 
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class TransactionFlows {
-    private Map<String, TransactionFlow> flows = new HashMap<String, TransactionFlow>();
+    private Map<String, TransactionFlow> flows = new LinkedHashMap<String, TransactionFlow>();
 
 
     public void addTransactionFlow(String txnName, TransactionFlow flow){
