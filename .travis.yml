@@ -1,4 +1,6 @@
 language: java
+before_install:
+  - sudo apt-get install -y libxml2-utils
 before_deploy:
     - git config --local user.name "torresashjian"
     - git config --local user.email "migueltorreslopez@gmail.com"
