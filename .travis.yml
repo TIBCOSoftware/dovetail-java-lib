@@ -14,7 +14,7 @@ before_deploy:
 deploy:
   provider: releases
   api_key: "$GITHUB_TOKEN"
-  file: "target/dovetail-runtime-${TRAVIS_TAG}.jar"
+  file: "target/dovetail-runtime-*.jar"
   skip_cleanup: true
   prerelease: $PRERELEASE
   name: $TRAVIS_TAG
