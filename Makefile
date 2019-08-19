@@ -12,6 +12,10 @@ is-prerelease:
 release-notes: 
 	@ $(SCRIPTS_PATH)/release-notes.sh
 
+.PHONY: checks
+checks: 
+	@ $(SCRIPTS_PATH)/checks.sh ${BUILD_TAG} ${PRERELEASE}
+
 .PHONY: artifacts
 artifacts: 
-	@ $(SCRIPTS_PATH)/artifacts.sh ${BUILD_TAG}
+	@ $(SCRIPTS_PATH)/artifacts.sh
