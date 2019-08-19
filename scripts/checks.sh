@@ -25,7 +25,7 @@ else
     fi
 fi
 
-current_valid_version="v"${current_version}
+current_valid_version=$(<version.txt)
 echo "Comparing current tag ${build_tag} and version ${current_valid_version}"
 if [[  ${build_tag} == $current_valid_version* ]];then
     echo "Versions in pom.xml and version.txt versions look ok"
