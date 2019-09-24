@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 
 import com.tibco.dovetail.core.runtime.util.CompareUtil;
 
-public class mathlib {
+public class math {
 	public static int toInt(Object val) {
 		return Integer.parseInt(val.toString());
 	}
@@ -50,7 +50,11 @@ public class mathlib {
 	}
 	
     public static Long sumLong(Object ...params){
-        return (Long)Arrays.asList(params).stream().collect(Collectors.summingLong(it -> ((Long)it).longValue()));
+    		Long result = Long.valueOf(params[0].toString());
+   		for(int i=1; i<params.length; i++) {
+   			result = java.lang.Math.addExact(result, Long.valueOf(params[i].toString()));
+   		}
+        return result;
     }
 
     public static Integer sumInt(Object ...params){
@@ -126,4 +130,20 @@ public class mathlib {
    		
    		return bd.divide(new BigDecimal(params.length), context).toPlainString();
    }
+   	
+   	public static Long subtractLong(Object ...params){
+   		Long result = Long.valueOf(params[0].toString());
+   		for(int i=1; i<params.length; i++) {
+   			result = java.lang.Math.subtractExact(result, Long.valueOf(params[i].toString()));
+   		}
+        return result;
+    }
+
+    public static Integer subtractInt(Object ...params){
+    		Integer result = (Integer)params[0];
+   		for(int i=0; i<params.length; i++) {
+   			result = result - (Integer)params[i];
+   		}
+        return result;
+    }
 }

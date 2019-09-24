@@ -14,9 +14,17 @@ public class ActivityConfig
 {
     private String ref;
     private Map<String, Object> input;
-    private TaskMappings mappings;
+    private Schemas schemas;
 
-    public String getRef ()
+    public Schemas getSchemas() {
+		return schemas;
+	}
+
+	public void setSchemas(Schemas schemas) {
+		this.schemas = schemas;
+	}
+
+	public String getRef ()
     {
         return ref;
     }
@@ -35,14 +43,24 @@ public class ActivityConfig
     {
         this.input = input;
     }
+    
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class Schemas {
+    		private Map<String, Map> input;
 
-    public TaskMappings getMappings ()
-    {
-        return mappings;
-    }
+		public Map<String, Map> getInput() {
+			return input;
+		}
 
-    public void setMappings (TaskMappings mappings)
-    {
-        this.mappings = mappings;
+		public void setInput(Map<String, Map> input) {
+			this.input = input;
+		}
+		
+		public String getInputSchema(String name) {
+			if(input == null)
+				return null;
+			
+			return input.get(name) == null? null:input.get(name).get("value").toString();
+		}
     }
 }

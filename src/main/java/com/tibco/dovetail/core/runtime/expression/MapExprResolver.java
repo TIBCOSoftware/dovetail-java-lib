@@ -17,7 +17,6 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -77,8 +76,9 @@ public class MapExprResolver extends MapExprGrammarBaseVisitor{
 
     @Override
     public Object visitFunctionExp(MapExprGrammarParser.FunctionExpContext ctx){
+    		String function = "";
         try {
-            String function = (String) visitFuncName(ctx.funcName());
+            function = (String) visitFuncName(ctx.funcName());
             String[] fn = function.split("\\.");
             
             if (fn.length != 2) {
@@ -115,7 +115,7 @@ public class MapExprResolver extends MapExprGrammarBaseVisitor{
 
             throw new RuntimeException("function " + function + " is not defined");
         }catch (Exception e){
-            throw new RuntimeException(e);
+            throw new RuntimeException("error while processing function " + function, e);
         }
     }
 
@@ -223,24 +223,28 @@ public class MapExprResolver extends MapExprGrammarBaseVisitor{
     }
 
     private Object readValue(Object v, String path){
-        DocumentContext doc = null;
-        if(v instanceof DocumentContext)
-        		doc = (DocumentContext) v;
-        else if(v instanceof LinkedHashMap)
-        		doc = JsonUtil.getJsonParser().parse((LinkedHashMap)v);
-        
-        if(doc.json() instanceof JSONArray)
-            path = "$.." + path;
-        else
-            path = "$." + path;
-        List<Object> list= doc.read(path);
-        Object value = null;
-        if(list.size() == 1)
-            value = list.get(0);
-        else
-            value = list;
-
-        return value;
+    		DocumentContext doc = null;
+    	    try {
+	        if(v instanceof DocumentContext)
+	        		doc = (DocumentContext) v;
+	        else if(v instanceof LinkedHashMap)
+	        		doc = JsonUtil.getJsonParser().parse((LinkedHashMap)v);
+	        
+	        if(doc.json() instanceof JSONArray)
+	            path = "$.." + path;
+	        else
+	            path = "$." + path;
+	        List<Object> list= doc.read(path);
+	        Object value = null;
+	        if(list.size() == 1)
+	            value = list.get(0);
+	        else
+	            value = list;
+	
+	        return value;
+    	    }catch (Exception e) {
+    	    		throw new RuntimeException("error while readValue of " + path + " from " + doc.jsonString(), e);
+    	    }
     }
 
     @Override
@@ -248,43 +252,58 @@ public class MapExprResolver extends MapExprGrammarBaseVisitor{
         List<TerminalNode> names = ctx.NAME();
 
         String var = names.get(0).getText().trim();
-        int element = -1;
-        
-        if(var.endsWith("]")) {
-        		int idx = var.indexOf("[");
-        		element = Integer.parseInt(var.substring(idx+1, var.length()-1));
-        		var = var.substring(0, idx);
+        try {
+	        int element = -1;
+	        
+	        if(var.endsWith("]")) {
+	        		int idx = var.indexOf("[");
+	        		element = Integer.parseInt(var.substring(idx+1, var.length()-1));
+	        		var = var.substring(0, idx);
+	        }
+	        Object value = scope.getVariable(Scope.SCOPE_FLOW, var);
+	        
+	        if(names.size() > 1){
+	            String path = names.subList(1, names.size()).stream().map(it-> it.getText()).collect(Collectors.joining("."));
+	            value = readValue(value, path);
+	        }
+	 
+	        if(element >= 0 && value instanceof JSONArray)
+	        		return ((JSONArray)value).get(element);
+	        	else
+	        		return value;
+        }catch(Exception e) {
+        		throw new RuntimeException("error in visitFlow, var=" + var, e);
         }
-        Object value = scope.getVariable(Scope.SCOPE_FLOW, var);
-        
-        if(names.size() > 1){
-            String path = names.subList(1, names.size()).stream().map(it-> it.getText()).collect(Collectors.joining("."));
-            value = readValue(value, path);
-        }
-
-        if(element >= 0 && value instanceof JSONArray)
-        		return ((JSONArray)value).get(element);
-        	else
-        		return value;
     }
 
     @Override 
     public Object visitCurrent(MapExprGrammarParser.CurrentContext ctx) { 
     	  	List<TerminalNode> names = ctx.NAME();
-    	  	String path = names.stream().map(n -> n.getText()).collect(Collectors.joining("."));
-    	  	Object from = scope.getVariable(Scope.SCOPE_LOCAL, "from");
-    	  	if(from != null)
-    	  		return readValue(from, path);
-    	  	else
-    	  		return null;
+    	  	String path = null; 
+    	  	Object from  = null;
+    	  	
+    	  	if(scope.isRootScope()) {
+    	  		from = scope.getVariable(Scope.SCOPE_CURRENT, names.get(0).getText());
+    	  		path = names.subList(1, names.size()).stream().map(n -> n.getText()).collect(Collectors.joining("."));
+    	  	}
+    	  	else {
+    	  		from = scope.getVariable(Scope.SCOPE_CURRENT, "from");
+    	  		path = names.stream().map(n -> n.getText()).collect(Collectors.joining("."));
+    	  	}
+    	  	
+    	  	if(from == null || path == null || path.isEmpty()) 
+    	  		return from;
+    	  
+    	  	return readValue(from, path);
+    	  	
     	}
     
     @Override public Integer visitIteratorKey(MapExprGrammarParser.IteratorKeyContext ctx) { 
-    		return (int) scope.getVariable("$current", "key"); 
+    		return (int) scope.getVariable("$iteration", "key"); 
     	}
 	
 	@Override public Object visitIteratorValue(MapExprGrammarParser.IteratorValueContext ctx) { 
-		Object value = scope.getVariable("$current", "value");
+		Object value = scope.getVariable("$iteration", "value");
 		if (value != null ) {
 			List<TerminalNode> names = ctx.NAME();
     	  		String path = names.stream().map(n -> n.getText()).collect(Collectors.joining("."));
@@ -292,7 +311,12 @@ public class MapExprResolver extends MapExprGrammarBaseVisitor{
 		} else 
 			return null;
 	}
-
+	
+	@Override public Object visitProperty(MapExprGrammarParser.PropertyContext ctx) {
+		String p = ctx.NAME().stream().map(it -> it.getText()).collect(Collectors.joining("."));
+		return scope.getVariable(Scope.SCOPE_PROPERTY, p); 
+	}
+	
 }
 
 

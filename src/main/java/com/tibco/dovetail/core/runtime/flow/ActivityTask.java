@@ -5,7 +5,7 @@
  */
 package com.tibco.dovetail.core.runtime.flow;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import org.antlr.v4.runtime.tree.ParseTree;
 
@@ -14,8 +14,8 @@ public class ActivityTask {
     String activityRef;
     boolean isIteratorTask = false;
     ParseTree iterateField = null;
-	HashMap<String, Mapping> inputs = new HashMap<String, Mapping>();
-    HashMap<String, Mapping> outputs = new HashMap<String, Mapping>();
+	LinkedHashMap<String, AttributeMapping> inputs = new LinkedHashMap<String, AttributeMapping>();
+    LinkedHashMap<String, AttributeMapping> outputs = new LinkedHashMap<String, AttributeMapping>();
 
     public ActivityTask(String taskId) {
         this.taskId = taskId;
@@ -33,27 +33,27 @@ public class ActivityTask {
         this.activityRef = activityRef;
     }
 
-    public Mapping getInput(String name){
+    public AttributeMapping getInput(String name){
         return inputs.get(name);
     }
 
-    public Mapping getOutput(String name){
+    public AttributeMapping getOutput(String name){
         return outputs.get(name);
     }
 
-    public void addInput(String name, Mapping a){
+    public void addInput(String name, AttributeMapping a){
         this.inputs.put(name, a);
     }
 
-    public void addOutput(String name, Mapping a){
+    public void addOutput(String name, AttributeMapping a){
         this.outputs.put(name, a);
     }
 
-    public HashMap<String, Mapping> getInputs() {
+    public LinkedHashMap<String, AttributeMapping> getInputs() {
         return inputs;
     }
 
-    public HashMap<String, Mapping> getOutputs() {
+    public LinkedHashMap<String, AttributeMapping> getOutputs() {
         return outputs;
     }
 

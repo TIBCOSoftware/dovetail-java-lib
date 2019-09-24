@@ -18,7 +18,7 @@ import java.nio.charset.StandardCharsets;
 public class Link {
 
     private String condition;
-    private ParseTree conditionObject;
+    transient private ParseTree conditionObject;
 
     private LinkMapType type;
     private Node nextNode;
@@ -54,10 +54,10 @@ public class Link {
             InputStream stream = new ByteArrayInputStream(mapping.getBytes(StandardCharsets.UTF_8));
 
             MapExprGrammarLexer lexer = new MapExprGrammarLexer(CharStreams.fromStream(stream, StandardCharsets.UTF_8));
-
             CommonTokenStream tokens = new CommonTokenStream(lexer);
 
             MapExprGrammarParser parser = new MapExprGrammarParser(tokens);
+           
             stream.close();
             return parser.condition();
         }catch (Exception e){
@@ -85,7 +85,8 @@ public class Link {
                 case 3:
                     return error;
 
-                    default:return normal;
+                default:
+                		return normal;
 
             }
         }

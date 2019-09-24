@@ -6,28 +6,27 @@
 package com.tibco.dovetail.core.runtime.flow;
 
 import com.tibco.dovetail.core.model.common.SimpleAttribute;
-import com.tibco.dovetail.core.runtime.transaction.TxnInputAttribute;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 public class BasicTransactionFlow {
 	
     private Node root;
-    private Map<String, ActivityTask> tasks = new HashMap<String, ActivityTask>();
-    private List<TxnInputAttribute> flowInputs = new ArrayList<TxnInputAttribute>();
+    private Map<String, ActivityTask> tasks = new LinkedHashMap<String, ActivityTask>();
+    private List<SimpleAttribute> flowInputs = new ArrayList<SimpleAttribute>();
     private List<SimpleAttribute> flowOutputs = new ArrayList<SimpleAttribute>();
 
-    public List<TxnInputAttribute> getFlowInputs(){return this.flowInputs;}
+    public List<SimpleAttribute> getFlowInputs(){return this.flowInputs;}
     public List<SimpleAttribute> getFlowOutputs(){return this.flowOutputs;}
     
-    public void setFlowInputs(List<TxnInputAttribute> input){
+    public void setFlowInputs(List<SimpleAttribute> input){
        this.flowInputs = input;
     }
     
-    public void addFlowInput(TxnInputAttribute input){
+    public void addFlowInput(SimpleAttribute input){
          this.flowInputs.add(input);
     }
     public void setFlowOutputs(List<SimpleAttribute> output){
