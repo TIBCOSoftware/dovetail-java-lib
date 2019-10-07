@@ -3,13 +3,13 @@
 * This file is subject to the license terms contained
 * in the license file that is distributed with this file.
  */
-package com.tibco.dovetail.core.model.composer;
+package com.tibco.dovetail.core.model.metadata;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.tibco.dovetail.core.model.common.SimpleAttribute;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class HLCAttribute extends SimpleAttribute {
+public class Attribute extends SimpleAttribute {
 
     boolean required = true;
     boolean isRef = false;
@@ -21,12 +21,13 @@ public class HLCAttribute extends SimpleAttribute {
     boolean isAsset = false;
 	boolean isParticipant = false;
     boolean isReferenceData = false;
+    PartyType partyType = PartyType.Participant;
     
     public boolean isAsset() {
 		return isAsset;
 	}
 
-	public void setAsset(boolean isAsset) {
+	public void setIsAsset(boolean isAsset) {
 		this.isAsset = isAsset;
 	}
 
@@ -34,7 +35,7 @@ public class HLCAttribute extends SimpleAttribute {
 		return isParticipant;
 	}
 
-	public void setParticipant(boolean isParticipant) {
+	public void setIsParticipant(boolean isParticipant) {
 		this.isParticipant = isParticipant;
 	}
 
@@ -42,7 +43,7 @@ public class HLCAttribute extends SimpleAttribute {
 		return isReferenceData;
 	}
 
-	public void setReferenceData(boolean isReferenceData) {
+	public void setIsReferenceData(boolean isReferenceData) {
 		this.isReferenceData = isReferenceData;
 	}
 
@@ -101,6 +102,17 @@ public class HLCAttribute extends SimpleAttribute {
     public boolean isRequired() {
         return required;
     }
+    
+    public void setPartyType(String partytype) {
+    		if(partytype != null && !partytype.isEmpty())
+    			this.partyType = PartyType.valueOf(partytype);
+    }
+    
+    public PartyType getPartyType() {
+		return this.partyType;
+    }
 
-
+    public static enum PartyType {
+    		Participant, Observer, Notary;
+    }
 }

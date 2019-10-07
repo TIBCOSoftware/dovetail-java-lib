@@ -11,6 +11,7 @@ import java.util.Map;
 
 import com.tibco.dovetail.core.model.common.SimpleAttribute;
 import com.tibco.dovetail.core.model.flow.AppProperty;
+import com.tibco.dovetail.core.model.metadata.TimeWindow;
 import com.tibco.dovetail.core.runtime.engine.ContextImpl;
 import com.tibco.dovetail.core.runtime.engine.FlowEngine;
 import com.tibco.dovetail.core.runtime.engine.InputResolver;
@@ -30,6 +31,15 @@ public class TransactionFlow extends BasicTransactionFlow{
     private List<AttributeMapping> txnToFlowMapping = new ArrayList<AttributeMapping>();
     private List<AttributeMapping> flowToTxnMapping = new ArrayList<AttributeMapping>();
     
+    private TimeWindow timewindowl;
+    
+    public TransactionFlow(BasicTransactionFlow flow) {
+    		this.setFlowInputs(flow.getFlowInputs());
+    		this.setFlowOutputs(flow.getFlowOutputs());
+    		this.setTasks(flow.getTasks());
+    		this.setRoot(flow.getRoot());
+    		this.setTransactionName(flow.getTransactionName());
+    }
 	public List<TxnInputAttribute> getTxnInputs() {
 		return txnInputs;
 	}
@@ -89,6 +99,12 @@ public class TransactionFlow extends BasicTransactionFlow{
 	}
 	public void setProperties(Map<String, Object> properties2) {
 		this.properties = properties2;
+	}
+	public TimeWindow getTimewindowl() {
+		return timewindowl;
+	}
+	public void setTimewindowl(TimeWindow timewindowl) {
+		this.timewindowl = timewindowl;
 	}
 	
 }

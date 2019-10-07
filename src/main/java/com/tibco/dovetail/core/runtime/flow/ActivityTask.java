@@ -11,11 +11,13 @@ import org.antlr.v4.runtime.tree.ParseTree;
 
 public class ActivityTask {
     String taskId;
-    String activityRef;
+	String activityRef;
     boolean isIteratorTask = false;
+    boolean isSubflow = false;
     ParseTree iterateField = null;
 	LinkedHashMap<String, AttributeMapping> inputs = new LinkedHashMap<String, AttributeMapping>();
     LinkedHashMap<String, AttributeMapping> outputs = new LinkedHashMap<String, AttributeMapping>();
+    LinkedHashMap<String, Object> settings = new LinkedHashMap<String, Object>();
 
     public ActivityTask(String taskId) {
         this.taskId = taskId;
@@ -24,6 +26,14 @@ public class ActivityTask {
     public String getTaskId() {
         return taskId;
     }
+
+    public boolean isSubflow() {
+		return isSubflow;
+	}
+
+	public void setSubflow(boolean isSubflow) {
+		this.isSubflow = isSubflow;
+	}
 
     public String getActivityRef() {
         return activityRef;
@@ -55,6 +65,18 @@ public class ActivityTask {
 
     public LinkedHashMap<String, AttributeMapping> getOutputs() {
         return outputs;
+    }
+    
+    public Object getSetting(String name){
+        return settings.get(name);
+    }
+    
+    public LinkedHashMap<String, Object> getSettings(){
+        return settings;
+    }
+
+    public void addSetting(String name, Object a){
+        this.settings.put(name, a);
     }
 
     public boolean isIteratorTask() {

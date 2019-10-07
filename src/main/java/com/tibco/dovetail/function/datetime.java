@@ -12,8 +12,35 @@ public class datetime {
 		return Instant.now();
 	}
 	
-	public static Instant addTime(Instant instant, int hours, int minutes, int seconds) {
-		return instant.plusSeconds(hours * 3600 + minutes * 60 + seconds);
+	public static String addTime(String instant, long hours, long minutes, long seconds) {
+		Instant dt = Instant.parse(instant);
+		return dt.plusSeconds(hours * 3600 + minutes * 60 + seconds).toString();
 	}
 	
+	public static String minusTime(String instant, long hours, long minutes, long seconds) {
+		Instant dt = Instant.parse(instant);
+		return dt.minusSeconds(hours * 3600 + minutes * 60 + seconds).toString();
+	}
+	
+	public static String addDays(String instant, long days) {
+		Instant dt = Instant.parse(instant);
+		return dt.plusSeconds(days * 24 * 60 *60).toString();
+	}
+	
+	public static String minusDays(String instant, long days) {
+		Instant dt = Instant.parse(instant);
+		return dt.minusSeconds(days * 24 * 60 *60).toString();
+	}
+	
+	public static boolean isBefore(String instant, String compareTo) {
+		Instant dt1 = Instant.parse(instant);
+		Instant dt2 = Instant.parse(compareTo);
+		return dt1.isBefore(dt2);
+	}
+	
+	public static boolean isAfter(String instant, String compareTo) {
+		Instant dt1 = Instant.parse(instant);
+		Instant dt2 = Instant.parse(compareTo);
+		return dt1.isAfter(dt2);
+	}
 }

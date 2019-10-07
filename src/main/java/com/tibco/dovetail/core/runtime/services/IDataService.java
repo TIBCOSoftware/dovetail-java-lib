@@ -21,8 +21,8 @@ public interface IDataService <T, R>{
     
     public R getState(String assetName, String assetKey, T keyValue);
     public List<R> getStates(String assetName, String assetKey, Set<T> keyValue);
-    public R putState(String assetName, String assetKey, R assetValue);
-    public R deleteState(String assetName, String assetKey, T keyValue);
+    public R putState(String txn, String assetName, String assetKey, R assetValue);
+    public R deleteState(String txn, String assetName, String assetKey, T keyValue);
     public boolean processPayment(DocumentContext assetValue);
     public List<R> lookupState(String assetName, String assetKey, T keyValue);
     public List<R> getHistory(String assetName, String assetKey, T keyValue);

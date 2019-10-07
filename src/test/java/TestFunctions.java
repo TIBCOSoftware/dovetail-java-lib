@@ -1,9 +1,12 @@
 import static org.junit.Assert.assertEquals;
 
+import java.math.MathContext;
+import java.math.RoundingMode;
 import java.util.Arrays;
 
 import org.junit.Test;
 
+import java.math.BigDecimal;
 import com.tibco.dovetail.function.array;
 import com.tibco.dovetail.function.string;
 
@@ -30,6 +33,7 @@ public class TestFunctions {
 		assertEquals("abc", string.lowerCase("AbC"));
 		
 		assertEquals("ABC", string.upperCase("abC"));
+		
 	}
 
 	@Test
@@ -48,5 +52,15 @@ public class TestFunctions {
 		
 		assertEquals(true, array.contains(Arrays.asList("a", "b", "c"), "a"));
 
+	}
+	
+	@Test
+	public void test_decimal() {
+		BigDecimal op1 = BigDecimal.valueOf(10);
+		BigDecimal op2 = BigDecimal.valueOf(1.25);
+		BigDecimal result = op1.multiply(op2).setScale(2, RoundingMode.HALF_EVEN);
+
+		System.out.println(result.toPlainString());
+		assertEquals("12.50", result.toPlainString());
 	}
 }

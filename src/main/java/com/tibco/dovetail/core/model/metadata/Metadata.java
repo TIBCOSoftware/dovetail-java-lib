@@ -3,10 +3,8 @@
 * This file is subject to the license terms contained
 * in the license file that is distributed with this file.
  */
-package com.tibco.dovetail.core.model.composer;
+package com.tibco.dovetail.core.model.metadata;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,13 +12,13 @@ import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class HLCMetadata {
+public class Metadata {
     private String name;
     private ResourceType type;
-    private Map<String, HLCDecorator> decorators = new LinkedHashMap<String, HLCDecorator>();
-    private List<String> actors = new ArrayList<String>();
     private String asset = null;
-
+    private Map<String, String> authorizedUserAndCerts = new LinkedHashMap<String, String>();
+    private TimeWindow timewindow;
+    
     public String getName() {
         return name;
     }
@@ -34,16 +32,20 @@ public class HLCMetadata {
     public void setType(String type) {
         this.type = ResourceType.valueOf(type);
     }
-
-    public void setDecorators(List<HLCDecorator> inputs) {
-    	inputs.forEach(in -> this.decorators.put(in.getName(), in));
-    }
     
-    public List<String> getActors() {
-		return actors;
+    public Map<String, String> getAuthorizedUserAndCerts() {
+		return authorizedUserAndCerts;
 	}
 	public void setActors(List<String> actors) {
-		this.actors = actors;
+		if(actors != null) {
+			actors.forEach(a -> {
+				String[] callers = a.split("\\|");
+				if(callers.length == 1)
+					authorizedUserAndCerts.put(callers[0], null);
+				else
+					authorizedUserAndCerts.put(callers[0], callers[1]);
+			});
+		}
 	}
 	public String getAsset() {
 		return asset;
@@ -51,15 +53,15 @@ public class HLCMetadata {
 	public void setAsset(String asset) {
 		this.asset = asset;
 	}
-	public Collection<HLCDecorator> getDecorators() {
-       return decorators.values();
-    }
-
-    public HLCDecorator getDecorator(String name) {
-    		return this.decorators.get(name);
-    }
     
+	public TimeWindow getTimewindow() {
+		return timewindow;
+	}
+	public void setTimewindow(TimeWindow timewindow) {
+		this.timewindow = timewindow;
+	}
+
 	public static enum ResourceType {
-        Asset, Participant, Transaction, Event, Concept
+        Asset, Participant, Transaction, Event, Concept, ScheduledEvent
     }
 }

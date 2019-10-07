@@ -9,11 +9,13 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.tibco.dovetail.core.model.common.SimpleAttribute;
 
 import java.util.List;
+import java.util.Map;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Metadata {
     private List<SimpleAttribute> input;
     private List<SimpleAttribute> output;
+    private Map<String, String> fe_metadata;
 
     public List<SimpleAttribute> getInput() {
         return input;
@@ -30,4 +32,12 @@ public class Metadata {
     public void setOutput(List<SimpleAttribute> output) {
         this.output = output;
     }
+
+	public Map<String, String> getFe_metadata() {
+		return fe_metadata;
+	}
+
+	public void setFe_metadata(Map<String, String> fe_metadata) {
+		this.fe_metadata = fe_metadata;
+	}
 }

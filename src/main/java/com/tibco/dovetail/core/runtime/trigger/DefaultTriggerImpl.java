@@ -7,6 +7,7 @@ import java.util.Map;
 import com.tibco.dovetail.core.model.flow.AppProperty;
 import com.tibco.dovetail.core.model.flow.HandlerConfig;
 import com.tibco.dovetail.core.model.flow.TriggerConfig;
+import com.tibco.dovetail.core.runtime.compilers.App;
 import com.tibco.dovetail.core.runtime.compilers.FlowCompiler;
 import com.tibco.dovetail.core.runtime.flow.ReplyData;
 import com.tibco.dovetail.core.runtime.flow.TransactionFlow;
@@ -34,9 +35,9 @@ public abstract class DefaultTriggerImpl implements ITrigger{
 	}
 	
 	@Override
-	public Map<String, ITrigger> Initialize(TriggerConfig triggerConfig, List<AppProperty> pp) {
+	public Map<String, ITrigger> Initialize(TriggerConfig triggerConfig, App app) {
 		try {
-			this.properties = pp;
+			this.properties = app.getProperties();
 			HandlerConfig[] handlerConfigs = triggerConfig.getHandlers();
 			if(handlerConfigs == null || handlerConfigs.length == 0)
 				throw new RuntimeException("No handlers defined for trigger " + triggerConfig.getName());
@@ -44,11 +45,14 @@ public abstract class DefaultTriggerImpl implements ITrigger{
 			Map<String, ITrigger> lookup = new LinkedHashMap<String, ITrigger>();
 			
 			for(int j=0; j<handlerConfigs.length; j++) {
-				TransactionFlow flow = FlowCompiler.compile(handlerConfigs[j]);
+				TransactionFlow flow = new TransactionFlow(app.getFlow(handlerConfigs[j].getFlowId()));
+				flow = FlowCompiler.compileTriggeFlowMapping(flow, handlerConfigs[j]);
 				processTxnInput(flow, handlerConfigs[j]);
 	  
-	            handlers.put(handlerConfigs[j].getFlowName(), flow);
-	            lookup.put(handlerConfigs[j].getFlowName(), this);
+	            handlers.put(handlerConfigs[j].getFlowId(), flow);
+	            handlers.put(flow.getTransactionName(), flow);
+	            lookup.put(handlerConfigs[j].getFlowId(), this);
+	            lookup.put(flow.getTransactionName(), this);
 			}
 			
 			 return lookup;
