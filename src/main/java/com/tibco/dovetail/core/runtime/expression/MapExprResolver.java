@@ -6,6 +6,7 @@
 package com.tibco.dovetail.core.runtime.expression;
 
 import com.jayway.jsonpath.DocumentContext;
+import com.jayway.jsonpath.internal.JsonContext;
 import com.tibco.dovetail.core.runtime.engine.Scope;
 import com.tibco.dovetail.core.runtime.util.CompareUtil;
 import com.tibco.dovetail.core.runtime.util.JsonUtil;
@@ -223,7 +224,13 @@ public class MapExprResolver extends MapExprGrammarBaseVisitor{
 
     private Object readElementValue(Object v, int idx) {
     		
-    		List values = (List)v;
+    		List values;
+    		if(v instanceof List)
+    			values = (List)v;
+    		else if(v instanceof JsonContext)
+    			values = (List)((JsonContext)v).json();
+    		else
+    			throw new RuntimeException("value is not a list: " + v.toString());
     		
     		return values.get(idx);
     }
