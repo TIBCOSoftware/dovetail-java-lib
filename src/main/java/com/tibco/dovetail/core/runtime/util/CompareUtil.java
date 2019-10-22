@@ -33,8 +33,19 @@ public class CompareUtil implements Comparator{
 		} else {
 	        if(v1 instanceof String || v2 instanceof String)
 	            return stringCompare(v1, v2, op);
-	        else if(v1 instanceof BigDecimal || v2 instanceof BigDecimal)
-	            return numberCompare((BigDecimal)v1, (BigDecimal)v2, op);
+	        else if(v1 instanceof BigDecimal || v2 instanceof BigDecimal) {
+	        		BigDecimal b1, b2;
+	        		if(v1 instanceof BigDecimal)
+	        			b1 = (BigDecimal) v1;
+	        		else
+	        			b1 = new BigDecimal(v1.toString());
+	        		
+	        		if(v2 instanceof BigDecimal)
+	        			b2 = (BigDecimal) v2;
+	        		else
+	        			b2 = new BigDecimal(v2.toString());
+	            return numberCompare(b1, b2, op);
+	        }
 	        else
 	            return numberCompare(((Number)v1).longValue(), ((Number)v2).longValue(), op);
 		}

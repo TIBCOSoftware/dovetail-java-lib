@@ -14,13 +14,18 @@ import java.util.Map;
 abstract public class Context {
     protected Map<String, Object> inputs = new LinkedHashMap<>();
     private Map<String, Object> outputs = new LinkedHashMap<>();
+    protected Map<String, Object> settings = new LinkedHashMap<>();
+    
     protected IContainerService containerService;
     protected ReplyHandler reply;
 
     public Object getInput(String param) {
         return inputs.get(param);
     }
-
+    
+    public Object getSetting(String param) {
+    		return settings.get(param);
+    }
     public Map<String, Object> getInputs() {
         return this.inputs;
     }

@@ -5,8 +5,13 @@
  */
 package com.tibco.dovetail.core.model.flow;
 
+import java.io.IOException;
 import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.tibco.dovetail.core.model.metadata.ResourceDescriptor;
+import com.tibco.dovetail.core.model.metadata.MetadataParser;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class HandlerConfig {
@@ -14,8 +19,8 @@ public class HandlerConfig {
 	private Action action;
 	private Map<String, Object> schemas;
 	private Resources flowResource;
+	private ResourceDescriptor metadata;
 	private String flowId;
-	private String flowName;
 	
 	 public String getFlowURI() {
 		 if(this.action != null && this.action.getSettings() != null) {
@@ -46,7 +51,6 @@ public class HandlerConfig {
 	 public void setFlow(String flowId, Resources r) {
 		 this.flowId = flowId;
 		 this.flowResource = r;
-		 this.flowName = flowId.substring(5);
 	 }
 	 
 	 public Resources getFlow() {
@@ -55,10 +59,6 @@ public class HandlerConfig {
 	 
 	 public String getFlowId() {
 		 return this.flowId;
-	 }
-	 
-	 public String getFlowName() {
-		 return this.flowName;
 	 }
 	 
 	 public Map<String, Object> getSettings() {
@@ -81,14 +81,16 @@ public class HandlerConfig {
 		return schemas;
 	}
 
-	public void setSchemas(Map<String, Object> schemas) {
+	public void setSchemas(Map<String, Object> schemas) throws Exception {
 		this.schemas = schemas;
-	}
-	
-	public String getTransactionInputMetadata() {
 		Map<String, Object> txnout = (Map<String, Object>) this.schemas.get("output");
 		Map<String, Object> txnIn = (Map<String, Object>) txnout.get("transactionInput");
-		return txnIn.get("value").toString();
+		String txnschema = txnIn.get("value").toString();
+		this.metadata = MetadataParser.parseSingleSchema(txnschema);
+	}
+	
+	public ResourceDescriptor getTransactionInputMetadata() {
+		return this.metadata;
 	}
 	 
 	 @JsonIgnoreProperties(ignoreUnknown = true)

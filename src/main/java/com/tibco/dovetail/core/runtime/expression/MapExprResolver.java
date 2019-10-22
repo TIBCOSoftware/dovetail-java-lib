@@ -9,7 +9,6 @@ import com.jayway.jsonpath.DocumentContext;
 import com.tibco.dovetail.core.runtime.engine.Scope;
 import com.tibco.dovetail.core.runtime.util.CompareUtil;
 import com.tibco.dovetail.core.runtime.util.JsonUtil;
-import com.tibco.dovetail.function.string;
 
 import net.minidev.json.JSONArray;
 import org.antlr.v4.runtime.tree.TerminalNode;
@@ -211,8 +210,8 @@ public class MapExprResolver extends MapExprGrammarBaseVisitor{
 	    		var = var.substring(0, idx);
         }
         Object value = scope.getVariable("$activity", names.get(0).getText() + "." + var);
-        if(element >= 0 && value instanceof ArrayList)
-			value = ((ArrayList)value).get(element);
+        if(element >= 0)
+        		value = readElementValue(value, element);
         
         if(names.size() > 2){
             String path = names.subList(2, names.size()).stream().map(it-> it.getText()).collect(Collectors.joining("."));
@@ -222,6 +221,12 @@ public class MapExprResolver extends MapExprGrammarBaseVisitor{
     		return value;
     }
 
+    private Object readElementValue(Object v, int idx) {
+    		
+    		List values = (List)v;
+    		
+    		return values.get(idx);
+    }
     private Object readValue(Object v, String path){
     		DocumentContext doc = null;
     	    try {
@@ -230,7 +235,7 @@ public class MapExprResolver extends MapExprGrammarBaseVisitor{
 	        else if(v instanceof LinkedHashMap)
 	        		doc = JsonUtil.getJsonParser().parse((LinkedHashMap)v);
 	        
-	        if(doc.json() instanceof JSONArray)
+	        if(doc.json() instanceof JSONArray || doc.json() instanceof List)
 	            path = "$.." + path;
 	        else
 	            path = "$." + path;
@@ -267,8 +272,8 @@ public class MapExprResolver extends MapExprGrammarBaseVisitor{
 	            value = readValue(value, path);
 	        }
 	 
-	        if(element >= 0 && value instanceof JSONArray)
-	        		return ((JSONArray)value).get(element);
+	        if(element >= 0 && value instanceof List)
+	        		return ((List)value).get(element);
 	        	else
 	        		return value;
         }catch(Exception e) {
@@ -318,5 +323,3 @@ public class MapExprResolver extends MapExprGrammarBaseVisitor{
 	}
 	
 }
-
-

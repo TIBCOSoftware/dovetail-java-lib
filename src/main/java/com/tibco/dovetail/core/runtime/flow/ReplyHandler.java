@@ -5,10 +5,12 @@
  */
 package com.tibco.dovetail.core.runtime.flow;
 
+import java.util.Map;
+
 public class ReplyHandler {
 	ReplyData reply = null;
     boolean hasReplied = false;
-	public void setReply(String data) {
+	public void setReply(Map<String, Object> data) {
 		if(!hasReplied) {
 			reply = new ReplyData(data);
 			hasReplied = true;

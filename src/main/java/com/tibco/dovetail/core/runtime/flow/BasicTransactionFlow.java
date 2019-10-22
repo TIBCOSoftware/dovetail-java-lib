@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 public class BasicTransactionFlow {
-	
+	private String transactionName;
     private Node root;
     private Map<String, ActivityTask> tasks = new LinkedHashMap<String, ActivityTask>();
     private List<SimpleAttribute> flowInputs = new ArrayList<SimpleAttribute>();
@@ -54,4 +54,10 @@ public class BasicTransactionFlow {
     public Map<String, ActivityTask> getTasks() {
         return tasks;
     }
+	public String getTransactionName() {
+		return transactionName;
+	}
+	public void setTransactionName(String transactionName) {
+		this.transactionName = transactionName;
+	}
 }

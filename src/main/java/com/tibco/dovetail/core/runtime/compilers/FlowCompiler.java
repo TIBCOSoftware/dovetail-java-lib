@@ -5,12 +5,14 @@
  */
 package com.tibco.dovetail.core.runtime.compilers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tibco.dovetail.core.model.activity.ActivityModel;
 import com.tibco.dovetail.core.model.common.SimpleAttribute;
-import com.tibco.dovetail.core.model.composer.MetadataParser;
 import com.tibco.dovetail.core.model.flow.*;
 import com.tibco.dovetail.core.model.flow.ActivityConfig.Schemas;
+import com.tibco.dovetail.core.model.metadata.MetadataParser;
 import com.tibco.dovetail.core.runtime.flow.*;
 
 import java.util.LinkedHashMap;
@@ -21,55 +23,32 @@ public class FlowCompiler {
 //	final static Pattern MAP_TO_ATTR_PATTERN = Pattern.compile("(\\$INPUT.\\$.\\$)?(\\['(?<name>\\w+)'\\])+?");
 //	final static Pattern FUNCTION = Pattern.compile("[a-zA-Z]+\\.[a-zA-Z].*?\\(.*?\\)");
 	
-    public static TransactionFlow compile( HandlerConfig cfg) throws Exception {
-    		Resources r = cfg.getFlow();
-    		ObjectMapper mapper = new ObjectMapper();
-    		TransactionFlow flow = new TransactionFlow();
-    		compileFlow(mapper, flow, r.getData());
-    		compileTriggerToFlowMapping(flow, cfg.getInput(), r.getData().getMetadata().getInput());
-    		compileFlowToTriggerMapping(flow, cfg.getOutput(), r.getData().getMetadata().getOutput());
+    public static TransactionFlow compileTriggeFlowMapping( TransactionFlow flow, HandlerConfig cfg) throws Exception {
+    		
+    		compileTriggerToFlowMapping(flow, cfg.getInput(), cfg.getFlow().getData().getMetadata().getInput());
+    		compileFlowToTriggerMapping(flow, cfg.getOutput(), cfg.getFlow().getData().getMetadata().getOutput());
     		
     		
-    		if(r.getData().getMetadata() != null) {
-               flow.setFlowOutputs(r.getData().getMetadata().getOutput());
-               flow.setFlowInputs(r.getData().getMetadata().getInput());
+    		if(cfg.getFlow().getData().getMetadata() != null) {
+               flow.setFlowOutputs(cfg.getFlow().getData().getMetadata().getOutput());
+               flow.setFlowInputs(cfg.getFlow().getData().getMetadata().getInput());
         }
-    		
-    		
-		 //error handler
-        //TODO: error handler input (activity, data, message)
-          /*
-          if(r.getData().getErrorHandler() != null){
-              BasicTransactionFlow errflow = new BasicTransactionFlow();
-              compileFlow(mapper, errflow, r.getData().getErrorHandler());
-              flow.setErrorHandler(errflow);
-          }*/
         
         return flow;
     }
     
-    private static void compileTriggerToFlowMapping(TransactionFlow flow, Map<String, Object> maps, List<SimpleAttribute> flowattrs) {
-    		for(SimpleAttribute attr : flowattrs) {
-    			Object value = maps.get(attr.getName());
-    			if(value != null) {
-    				flow.addTxnToFlowMapping(mapInputs(attr, value));
-    			}
-    		}
-    }
-    
-    private static void compileFlowToTriggerMapping(TransactionFlow flow, Map<String, Object> maps, List<SimpleAttribute> flowattrs) {
-		for(SimpleAttribute attr : flowattrs) {
-			Object value = maps.get(attr.getName());
-			if(value != null) {
-				flow.addFlowToTxnMapping(mapInputs(attr, value));
-			}
-		}
-}
-    
-    private static void compileFlow(ObjectMapper mapper, BasicTransactionFlow flow, BasicFlow data) throws Exception{
+    public static BasicTransactionFlow compileFlow(ObjectMapper mapper, FlowConfig data, BasicTransactionFlow flow) throws Exception{
         //tasks
         for(TasksConfig task : data.getTasks()){
-            flow.addTask(task.getId(), compileTask(mapper, task));
+        		if(task.getActivity().getRef().endsWith("actreturn")) {
+        			flow.addTask(task.getId(), compileReturn(mapper, task, data.getMetadata()));
+        		} else if(task.getActivity().getRef().endsWith("subflow")){
+        			String subflow = ((String) task.getActivity().getSettings().get("flowURI")).substring(11);
+        			
+        			flow.addTask(task.getId(), compileSubflow(mapper, task, subflow, flow));
+        		} else {
+        			flow.addTask(task.getId(), compileTask(mapper, task));
+        		}
         }
 
         //links
@@ -80,8 +59,65 @@ public class FlowCompiler {
         }
         
         flow.setRoot(root);
+        if(data.getMetadata() != null) {
+            flow.setFlowOutputs(data.getMetadata().getOutput());
+            flow.setFlowInputs(data.getMetadata().getInput());
+        }
+        return flow;
     }
 
+    private static ActivityTask compileSubflow(ObjectMapper mapper, TasksConfig config, String subflow, BasicTransactionFlow flow) throws Exception {
+    		ActivityTask activityTask = new ActivityTask(config.getId());
+    		activityTask.setActivityRef(config.getActivity().getRef());
+    		ActivityModel.registerActivity(activityTask.getActivityRef());
+		activityTask.setSubflow(true);
+		
+		Map<String, Object> input = config.getActivity().getInput();
+        if(input != null) {
+        		for(SimpleAttribute a : flow.getFlowInputs()) {
+	           
+                AttributeMapping inputMapping = null;
+                
+                Object mappingValue = input.get(a.getName());
+                if(mappingValue != null) {  
+                		inputMapping = mapInputs(a, mappingValue);
+                		
+                		activityTask.addInput(a.getName(), inputMapping);
+                }
+        		}
+        }
+		activityTask.addSetting("flowURI", subflow);
+		return activityTask;
+ 
+    }
+    private static ActivityTask compileReturn(ObjectMapper mapper, TasksConfig task, Metadata metadata) throws Exception {
+    		ActivityTask activityTask = new ActivityTask(task.getId());
+    		activityTask.setActivityRef(task.getActivity().getRef());
+    		ActivityModel.registerActivity(activityTask.getActivityRef());
+    		
+    		Map<String, Object> settings = task.getActivity().getSettings();
+    		
+    		if(settings != null) {
+    			List<SimpleAttribute> inputattrs = metadata.getOutput();
+    			Map<String, Object> input = (Map<String, Object>) settings.get("mappings");
+    			
+    			if(input != null) {
+    	            for (SimpleAttribute attr : inputattrs){
+    	                AttributeMapping inputMapping = null;
+    	                
+    	                Object mappingValue = input.get(attr.getName());
+    	                if(mappingValue != null) {  
+    	                		inputMapping = mapInputs(attr, mappingValue);
+    	                		
+    	                		activityTask.addInput(attr.getName(), inputMapping);
+    	                }
+    	            }
+    	        }
+    		}
+    		
+    		return activityTask;
+    }
+    
     private static ActivityTask compileTask(ObjectMapper mapper, TasksConfig task) throws Exception{
         ActivityTask activityTask = new ActivityTask(task.getId());
        
@@ -108,7 +144,7 @@ public class FlowCompiler {
                 			String meta = schemas.getInputSchema(a.getName());
                     		if(meta != null && !meta.trim().isEmpty()) {
                     			a.setMetaSchema(meta);
-                    			inputMapping.setComplextObjectMetadata(MetadataParser.parseSingleSchema(meta.toString()));
+                    			activityTask.addSetting(a.getName() + "_metadata", MetadataParser.parseSingleSchema(meta.toString()));
                     		}
                 		}
                 		
@@ -116,10 +152,28 @@ public class FlowCompiler {
                 }
             }
         }
-
+        
         return activityTask;
     }
     
+    private static void compileTriggerToFlowMapping(TransactionFlow flow, Map<String, Object> maps, List<SimpleAttribute> flowattrs) {
+		for(SimpleAttribute attr : flowattrs) {
+			Object value = maps.get(attr.getName());
+			if(value != null) {
+				flow.addTxnToFlowMapping(mapInputs(attr, value));
+			}
+		}
+}
+
+	private static void compileFlowToTriggerMapping(TransactionFlow flow, Map<String, Object> maps, List<SimpleAttribute> flowattrs) {
+		for(SimpleAttribute attr : flowattrs) {
+			Object value = maps.get(attr.getName());
+			if(value != null) {
+				flow.addFlowToTxnMapping(mapInputs(attr, value));
+			}
+		}
+	}
+	
     private static AttributeMapping mapInputs(SimpleAttribute a, Object mappingValue) {
     	 	AttributeMapping inputMapping = null;
 	    	switch(a.getType()) {
@@ -191,24 +245,5 @@ public class FlowCompiler {
 
         return a;
     }
-    
-   /* private static ArrayList<String> getInputAttrName(Pattern pattern, String mapTo) throws Exception {
-    		ArrayList<String> names = new ArrayList<String>();
-    		Matcher matcher = pattern.matcher(mapTo);
-		while(matcher.find()) {
-			names.add(matcher.group("name"));
-		}
-		
-		if(names.isEmpty())
-			throw new Exception("Invalid $INPUT format:" + mapTo);
-		
-		return names;
-    }
-    
-    private static boolean isFunctionMapping(String mapping) {
-    		Matcher matcher = FUNCTION.matcher(mapping);
-    		return matcher.matches();
-    }
-    */
     
 }

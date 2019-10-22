@@ -14,6 +14,7 @@ public class ActivityConfig
 {
     private String ref;
     private Map<String, Object> input;
+    private Map<String, Object> settings;
     private Schemas schemas;
 
     public Schemas getSchemas() {
@@ -44,23 +45,41 @@ public class ActivityConfig
         this.input = input;
     }
     
-    @JsonIgnoreProperties(ignoreUnknown = true)
+    public Map<String, Object> getSettings() {
+		return settings;
+	}
+
+	public void setSettings(Map<String, Object> settings) {
+		this.settings = settings;
+	}
+
+	@JsonIgnoreProperties(ignoreUnknown = true)
     public static class Schemas {
     		private Map<String, Map> input;
-
-		public Map<String, Map> getInput() {
-			return input;
-		}
+    		private Map<String, Map> output;
 
 		public void setInput(Map<String, Map> input) {
 			this.input = input;
 		}
 		
+		public void setOutput(Map<String, Map> output) {
+			this.output = output;
+		}
+		
 		public String getInputSchema(String name) {
-			if(input == null)
+			if(input == null && output == null)
 				return null;
 			
-			return input.get(name) == null? null:input.get(name).get("value").toString();
+			String result = null;
+			if(input != null && input.get(name) != null)
+				result = input.get(name).get("value").toString();
+			
+			if(result == null) {
+				if(output != null && output.get(name) != null)
+					result = output.get(name).get("value").toString();
+			}
+				
+			return result;
 		}
     }
 }

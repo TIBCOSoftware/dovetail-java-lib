@@ -38,12 +38,12 @@ public class InputResolver {
 	         		   context.addInput(key, edoc);
 	         	   } else if (ov instanceof List) {
 	         		   edoc = JsonUtil.getJsonParser().parse("[]");
-	         		   JSONArray values = edoc.json();
+	         		   List<Object> values = edoc.json();
 	         		   values.addAll((Collection<? extends Object>) ov);
 	         		  context.addInput(key, edoc);
 	         	   } else if (ov instanceof Object[]) {
 	         		   edoc = JsonUtil.getJsonParser().parse("[]");
-	         		   JSONArray values = edoc.json();
+	         		   List<Object> values = edoc.json();
 	         		   for (Object o : (Object[])ov)
 	 						values.add(o);
 	         		  context.addInput(key, edoc);
@@ -156,10 +156,17 @@ public class InputResolver {
 	    	String[] objs= rootPath.split("\\.");
     		String path = objs[0];
         for(int i=1; i<objs.length; i++){
-            JSONArray o = doc.read(path + "." + objs[i]);
-            if(o.get(0) == null) {
-                doc.put(path, objs[i], new LinkedHashMap<>());
+            Object o = doc.read(path + "." + objs[i]);
+            if(o == null) {
+            		doc.put(path, objs[i], new LinkedHashMap<>());
+            } else {
+            	  if(o instanceof List && ((List)o).get(0) == null) {
+            		  doc.put(path, objs[i], new LinkedHashMap<>());
+            	  } else if (o instanceof JSONArray && ((JSONArray)o).get(0) == null) {
+            		  doc.put(path, objs[i], new LinkedHashMap<>());
+            	  }
             }
+           
             path = path + "." + objs[i];
         }
 	   

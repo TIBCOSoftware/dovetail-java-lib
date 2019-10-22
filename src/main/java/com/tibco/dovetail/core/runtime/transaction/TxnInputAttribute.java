@@ -9,6 +9,8 @@ import com.tibco.dovetail.core.model.common.SimpleAttribute;
 
 public class TxnInputAttribute extends SimpleAttribute {
 	private boolean isAssetRef;
+	private boolean isAsset;
+	private boolean isReferenceData;
 	private boolean isArray;       
 	private String assetName;     
 	private String identifiers;   
@@ -42,5 +44,17 @@ public class TxnInputAttribute extends SimpleAttribute {
 	}
 	public void setParticipant(boolean isParticipant) {
 		this.isParticipant = isParticipant;
+	}
+	public boolean isAsset() {
+		return isAsset;
+	}
+	public void setAsset(boolean isAsset) {
+		this.isAsset = isAsset;
+	}
+	public boolean isReferenceData() {
+		return isReferenceData;
+	}
+	public void setReferenceData(boolean isReferenceData) {
+		this.isReferenceData = isReferenceData;
 	} 
 }

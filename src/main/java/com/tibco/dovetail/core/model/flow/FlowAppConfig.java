@@ -5,15 +5,11 @@
  */
 package com.tibco.dovetail.core.model.flow;
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -26,12 +22,19 @@ public class FlowAppConfig {
     private TriggerConfig[] triggers;
     private AppProperty[] properties;
     
-    
     private static LinkedHashMap<String, String> refs = new LinkedHashMap<String, String>();
 
-	public static FlowAppConfig parseModel(InputStream jsonModel) throws JsonParseException, JsonMappingException, IOException {
-    	 	ObjectMapper mapper = new ObjectMapper();
+	public static FlowAppConfig parseModel(ObjectMapper mapper, InputStream jsonModel) throws Exception {
         FlowAppConfig app = mapper.readValue(jsonModel, FlowAppConfig.class);
+        
+        for(String k : app.getResources().keySet()){
+	    	    Resources r = app.getResource(k);
+	    	    r.setId(r.getId().substring(5));
+	    	    for(TasksConfig t : r.getData().getTasks()) {
+					//set full reference url
+				t.getActivity().setRef(refs.get(t.getActivity().getRef()));
+			}
+        }
         
         //for each handler of a trigger, find the flow resource in the app and store inside the handler
         TriggerConfig[] triggers = app.getTriggers();
@@ -44,19 +47,14 @@ public class FlowAppConfig {
     				throw new RuntimeException("No handler for trigger " + triggers[i].getName());
     			
     			for(int j=0; j<handlers.length; j++) {
-    				String flowId = handlers[j].getFlowURI().split("//")[1];
-    				Resources r = app.getResource(flowId);
-    				if (r == null)
-    					throw new RuntimeException("Resource " + flowId + " does not exist");
-    				
-    				handlers[j].setFlow(flowId, r);
-    				
-    				for(TasksConfig t : r.getData().getTasks()) {
-    					//set full reference url
-    					t.getActivity().setRef(refs.get(t.getActivity().getRef()));
-    				}
+    				//format: res://flow:flowname
+    				String flowId = handlers[j].getFlowURI().substring(6);
+    				Resources r = app.getResource(flowId);	
+    				handlers[j].setFlow(flowId.substring(5), r);
     			}
         }
+        
+       
         return app;
 }
     
@@ -88,8 +86,12 @@ public class FlowAppConfig {
         return this.resources.get(resourceId);
     }
     
-    public Collection<Resources> getResources() {
-        return resources.values();
+    public Map<String, Resources> getResources() {
+        return resources;
+    }
+    
+    public Resources removeResource(String resourceId) {
+        return resources.remove(resourceId);
     }
 
     public void setResources(Resources[] resources) {
@@ -125,5 +127,4 @@ public class FlowAppConfig {
 	public void setProperties(AppProperty[] properties) {
 		this.properties = properties;
 	}
-
 }
