@@ -46,4 +46,62 @@ public class string {
         
         return tokens;
     }
+    
+    public static boolean contains(String arg, String substr){
+        return arg.contains( substr);
+    }
+    
+    public static boolean endsWith(String arg, String substr){
+        return arg.endsWith( substr);
+    }
+    
+    public static boolean startsWith(String arg, String substr){
+        return arg.startsWith( substr);
+    }
+    
+    public static boolean equals(String arg, String str){
+        return arg.equals(str);
+    }
+    
+    public static boolean equalsIgnoreCase(String arg, String str){
+        return arg.equalsIgnoreCase(str);
+    }
+    
+    public static int index(String arg, String str){
+        return arg.indexOf(str);
+    }
+    
+    public static int lastIndex(String arg, String str){
+        return arg.lastIndexOf(str);
+    }
+    
+    public static int len(String arg){
+        return arg.length();
+    }
+    
+    public static String substring(String arg, Object start, Object end){
+    		int a = Integer.valueOf(start.toString());
+    		int b = Integer.valueOf(end.toString());
+        return arg.substring(a, b);
+    }
+    
+    public static String substringBefore(String arg, String str){
+    		int idx = arg.indexOf(str);
+    		if(idx == -1)
+    			return "";
+    		
+        return arg.substring(0, idx);
+    }
+    
+    public static String substringAfter(String arg, String str){
+    		int idx = arg.indexOf(str);
+		if(idx == -1)
+			return "";
+		
+		return arg.substring(idx + str.length());
+    }
+    
+    public static String trim(String arg){
+        return arg.trim();
+    }
 }
