@@ -11,6 +11,7 @@ import java.util.Map;
 public class HLCAcl {
 	private List<String> authorizedParties;
 	private Map<String, String> conditions;
+	private String assetName = null;
 	
 	public List<String> getAuthorizedParties() {
 		return authorizedParties;
@@ -23,6 +24,12 @@ public class HLCAcl {
 	}
 	public void setConditions(Map<String, String> conditions) {
 		this.conditions = conditions;
+	}
+	public String getAssetName() {
+		return assetName;
+	}
+	public void setAssetName(String assetName) {
+		this.assetName = assetName;
 	}
 	
 }

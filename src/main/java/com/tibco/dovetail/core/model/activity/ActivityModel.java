@@ -48,7 +48,7 @@ public class ActivityModel {
     }
 
 
-    public static ActivityModel loadModel(ObjectMapper mapper, String ref) throws Exception{
+	public static ActivityModel loadModel(ObjectMapper mapper, String ref) throws Exception{
         String clazz = ModelUtil.getRefClassName(ref);
         InputStream isJson = Class.forName(clazz).getResourceAsStream("activity.json");
         if (isJson == null)
@@ -59,4 +59,9 @@ public class ActivityModel {
         isJson.close();
         return model;
     }
+	
+	public static void registerActivity(String ref) throws Exception {
+		 String clazz = ModelUtil.getRefClassName(ref);
+		 ActivityRegistry.registerActivity(ref, clazz);
+	}
 }

@@ -20,7 +20,6 @@ public class AttributeMapping{
 
     private String name; 
     private String dataType;
-	private HLCResource metadata = null;
 	transient private Object mappingValue;
     private ValueMappingType mappingType;
     transient private ParseTree from;
@@ -46,14 +45,6 @@ public class AttributeMapping{
 
     public String getName() {
     		return name;
-    }
-    
-    public void setComplextObjectMetadata(HLCResource metadata) {
-    		this.metadata = metadata;
-    }
-    
-    public HLCResource getComplextObjectMetadata() {
-    		return this.metadata;
     }
     
     public void setMappingType(ValueMappingType type) {

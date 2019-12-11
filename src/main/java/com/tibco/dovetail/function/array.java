@@ -20,11 +20,25 @@ public class array {
 		return Arrays.asList(args);
 	}
 	
-	public static int size(Collection<Object> col) {
+	public static int count(List<Object> col) {
 		if(col == null)
 			return 0;
 		else
 			return col.size();
+	}
+	
+	public static List<Object> append(List<Object> col, Object item) {
+		col.add(item);
+		return col;
+	}
+	
+	public static List<Object> delete(List<Object> col, long idx) {
+		col.remove(Integer.valueOf(Long.toString(idx)));
+		return col;
+	}
+	
+	public static Object get(List<Object> col, long idx) {
+		return col.get(Integer.valueOf(Long.toString(idx)));
 	}
 	
 	public static Set<String> distinct(Collection<Object> col) {

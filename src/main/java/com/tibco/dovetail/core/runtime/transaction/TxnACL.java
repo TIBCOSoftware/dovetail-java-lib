@@ -5,22 +5,26 @@
  */
 package com.tibco.dovetail.core.runtime.transaction;
 
-import java.util.List;
+import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class TxnACL {
-	private List<String> authorizedParties = null;
-	private Map<String, String> conditions = null;
 	
-	public TxnACL(List<String> parties, Map<String, String> conditions) {
-		this.authorizedParties = parties;
-		this.conditions = conditions;
+	private Map<String, Map<String, String>> authorization = new LinkedHashMap<String, Map<String, String>>();
+	
+	public TxnACL() {
+		
 	}
-	public List<String> getAuthorizedParties() {
-		return authorizedParties;
+	public Collection<String> getAuthorizedParties() {
+		return authorization.keySet();
 	}
 	
-	public Map<String, String> getConditions() {
-		return conditions;
+	public Map<String, String> getConditions(String party) {
+		return authorization.get(party);
+	}
+	
+	public void addAthorizedParty(String party, Map<String, String> conditions) {
+		this.authorization.put(party, conditions);
 	}
 }

@@ -5,14 +5,16 @@
  */
 package com.tibco.dovetail.core.runtime.flow;
 
+import java.util.Map;
+
 public class ReplyData {
-	String data;
+	Map<String, Object> data;
 	
-	public ReplyData(String data) {
+	public ReplyData(Map<String, Object> data) {
 		this.data =data;
 	}
 
-	public String getData() {
+	public Map<String, Object> getData() {
 		return data;
 	}
 }

@@ -5,6 +5,7 @@
  */
 package com.tibco.dovetail.core.runtime.engine;
 
+import java.util.List;
 import java.util.Map;
 
 import com.jayway.jsonpath.DocumentContext;
@@ -12,27 +13,26 @@ import com.tibco.dovetail.core.runtime.activity.IActivity;
 import com.tibco.dovetail.core.runtime.expression.MapExprResolver;
 import com.tibco.dovetail.core.runtime.flow.ActivityRegistry;
 import com.tibco.dovetail.core.runtime.flow.ActivityTask;
+import com.tibco.dovetail.core.runtime.flow.BasicTransactionFlow;
 import com.tibco.dovetail.core.runtime.flow.Link;
 import com.tibco.dovetail.core.runtime.flow.Node;
 import com.tibco.dovetail.core.runtime.flow.ReplyData;
 import com.tibco.dovetail.core.runtime.flow.ReplyHandler;
-import com.tibco.dovetail.core.runtime.flow.TransactionFlow;
 import com.tibco.dovetail.core.runtime.services.IContainerService;
 import com.tibco.dovetail.core.runtime.services.ILogService;
 import com.tibco.dovetail.core.runtime.util.JsonUtil;
 
 import co.paralleluniverse.fibers.Suspendable;
-import net.minidev.json.JSONArray;
 
 public class FlowEngine {
-	private TransactionFlow flow;
+	private BasicTransactionFlow flow;
     private IContainerService container;
     private ILogService logger;
     private Map<String, Object> flowInputs;
     private Scope scope;
     private ReplyHandler replyHandler;
 	
-    public FlowEngine (TransactionFlow flow){
+    public FlowEngine (BasicTransactionFlow flow){
         this.flow = flow;
         replyHandler = new ReplyHandler();
     }
@@ -49,16 +49,11 @@ public class FlowEngine {
 
             Node root = flow.getRoot();
             if(root == null)
-            		return new ReplyData("There is no activity in the flow");
+            		return null;
             
             runNode(root);
         }catch (Exception e){
-            if(flow.getErrorHandler() != null){
-                //TODO:
-                throw e;
-            } else {
-            		throw e;
-            }
+            	throw e;
         }
 
         return this.replyHandler.getReplyData();
@@ -104,7 +99,7 @@ public class FlowEngine {
         		//get iterate object
         		Object iterate = getIterateValue(id);
         		if(iterate != null) {
-        			JSONArray vals = ((DocumentContext)iterate).json();
+        			List<Object> vals = ((DocumentContext)iterate).json();
         			DocumentContext output = JsonUtil.getJsonParser().parse("[]");
         			for (int i=0; i<vals.size(); i++) {
                 		//set current scope variables
@@ -149,6 +144,7 @@ public class FlowEngine {
         		context = resolveInputs(id);
         		context = evalActivity(getActivityRef(id), context);
         		context.getOutputs().forEach((k, v) -> scope.addVariable("$activity", id + "." + k, v));
+        		
         }
 
     }
@@ -185,14 +181,12 @@ public class FlowEngine {
                 context.addInput(k, v.getMappingValue());
                 return;
             }
-            
-            if(v.getComplextObjectMetadata() != null ) {
-            		context.addInput(k+"_metadata", v.getComplextObjectMetadata());
-            }
 
             InputResolver.resolveInput(context, scope, k, v);
             
         });
+        
+        context.addSettings(activity.getSettings());
 
         return context;
     }
